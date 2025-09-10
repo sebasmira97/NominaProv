@@ -135,12 +135,12 @@ function setupCalculations(employeeDiv) {
     const pensionDeductionInput = employeeDiv.querySelector('.pensionDeduction');
     
     function calculateDeductions() {
-        const salary = parseFloat(salaryInput.value) || 0;
+        const salaryWorked = parseFloat(salaryWorkedInput.value) || 0;
         const healthPercentage = parseFloat(healthPercentageInput.value) || 4;
         const pensionPercentage = parseFloat(pensionPercentageInput.value) || 4;
         
-        healthDeductionInput.value = Math.round(salary * healthPercentage / 100);
-        pensionDeductionInput.value = Math.round(salary * pensionPercentage / 100);
+        healthDeductionInput.value = Math.round(salaryWorked * healthPercentage / 100);
+        pensionDeductionInput.value = Math.round(salaryWorked * pensionPercentage / 100);
     }
 
     // Calcular salario trabajado automáticamente
@@ -156,8 +156,8 @@ function setupCalculations(employeeDiv) {
     }
 
     salaryInput.addEventListener('input', () => {
-        calculateDeductions();
         calculateSalaryWorked();
+        calculateDeductions();
     });
     healthPercentageInput.addEventListener('input', calculateDeductions);
     pensionPercentageInput.addEventListener('input', calculateDeductions);
@@ -165,12 +165,18 @@ function setupCalculations(employeeDiv) {
     // También recalcular salario trabajado cuando cambian los días trabajados
     const workedDaysInput = employeeDiv.querySelector('.workedDays');
     if (workedDaysInput) {
-        workedDaysInput.addEventListener('input', calculateSalaryWorked);
+        workedDaysInput.addEventListener('input', () => {
+            calculateSalaryWorked();
+            calculateDeductions();
+        });
     }
 
+    // También recalcular deducciones cuando cambia el salario trabajado
+    salaryWorkedInput.addEventListener('input', calculateDeductions);
+
     // Calcular inicialmente
-    calculateDeductions();
     calculateSalaryWorked();
+    calculateDeductions();
 }
 
 function generateEmployeeJSON(employeeDiv) {
@@ -595,9 +601,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializar ciudades desde la API
     initializeCities();
-    
-    // Agregar primer empleado
-    addEmployee();
+
+    // Inicializar cálculos automáticos para el único empleado
+    const unicoEmpleado = document.querySelector('.employee-section');
+    if (unicoEmpleado) {
+        setupCalculations(unicoEmpleado);
+    }
 });
 
 // Función para inicializar las ciudades
