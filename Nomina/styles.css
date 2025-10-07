@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -226,8 +225,8 @@ input:focus, select:focus, textarea:focus {
 
 .form-row-3 {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 15px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
 }
 
 .form-row-2 {
@@ -238,6 +237,116 @@ input:focus, select:focus, textarea:focus {
 .form-row-2 .form-group {
     flex: 1 1 0;
     min-width: 180px;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 4px;
+    color: #666;
+    font-size: 0.85em;
+    font-style: italic;
+}
+
+.info-icon, .help-icon {
+    display: inline-block;
+    margin-left: 5px;
+    cursor: help;
+    font-size: 0.9em;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.info-icon:hover, .help-icon:hover {
+    opacity: 1;
+}
+
+.help-text {
+    display: block;
+    margin-top: 4px;
+    color: #666;
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+/* Tooltip mejorado */
+.info-icon[title], .help-icon[title] {
+    position: relative;
+}
+
+/* Resumen de Pagos */
+.payment-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.summary-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.summary-card.total-final {
+    grid-column: 1 / -1;
+    background: #e8f5e8;
+    border-color: #28a745;
+    text-align: center;
+}
+
+.summary-card h4 {
+    margin: 0 0 12px 0;
+    color: #495057;
+    font-size: 1.1em;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 4px 0;
+}
+
+.summary-total {
+    border-top: 2px solid #dee2e6;
+    margin-top: 12px;
+    padding-top: 8px;
+    color: #495057;
+}
+
+.final-amount {
+    font-size: 2em;
+    font-weight: bold;
+    color: #28a745;
+    margin: 8px 0;
+}
+
+.devengados {
+    border-left: 4px solid #28a745;
+}
+
+.deducciones {
+    border-left: 4px solid #dc3545;
+}
+
+/* Campos obligatorios */
+.required {
+    color: #dc3545;
+}
+
+.form-group.has-error input,
+.form-group.has-error select {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.8em;
+    margin-top: 4px;
+    display: block;
 }
 
 @media (max-width: 768px) {
@@ -253,5 +362,9 @@ input:focus, select:focus, textarea:focus {
     .employee-header {
         flex-direction: column;
         gap: 10px;
+    }
+    
+    .payment-summary {
+        grid-template-columns: 1fr;
     }
 }

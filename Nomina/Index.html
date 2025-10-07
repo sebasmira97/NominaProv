@@ -58,11 +58,17 @@
             <h2><span class="icon">📅</span>Información del Período</h2>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="dateEntry">Fecha de Ingreso</label>
+                    <label for="dateEntry">
+                        Fecha de Ingreso 
+                        <span class="info-icon" title="Fecha en que el empleado ingresó a la empresa. Se usa para calcular antigüedad y prestaciones sociales.">ℹ️</span>
+                    </label>
                     <input type="date" id="dateEntry">
                 </div>
                 <div class="form-group">
-                    <label for="departureDate">Fecha de Retiro</label>
+                    <label for="departureDate">
+                        Fecha de Retiro
+                        <span class="info-icon" title="Fecha en que el empleado se retiró de la empresa. Importante! Si el empleado aun esta contratado deja este campo sin llenar.">ℹ️</span>
+                    </label>
                     <input type="date" id="departureDate" placeholder="Dejar vacío si está activo">
                 </div>
                 <div class="form-group">
@@ -75,16 +81,17 @@
                 </div>
                 <div class="form-group">
                     <label for="timeWorked">Tiempo Trabajado (días)</label>
-                    <input type="number" id="timeWorked" placeholder="30" value="30">
+                    <input type="number" id="timeWorked" placeholder="30" value="30" readonly>
+                    <small style="color: #666; font-size: 0.9em;">Se actualiza automáticamente según el período seleccionado</small>
                 </div>
                 <div class="form-group">
                     <label for="periodId">Período</label>
                     <select id="periodId">
-                        <option value="1">Diario</option>
-                        <option value="2">Semanal</option>
-                        <option value="3">Decenal</option>
-                        <option value="4">Quicenal</option>
-                        <option value="5" selected>Mensual</option>
+                        <option value="1">Diario (1 día)</option>
+                        <option value="2">Semanal (7 días)</option>
+                        <option value="3">Decenal (10 días)</option>
+                        <option value="4">Quincenal (15 días)</option>
+                        <option value="5" selected>Mensual (30 días)</option>
                         <option value="6">Otro (acuerdo especial)</option>
                     </select>
                 </div>
@@ -93,7 +100,7 @@
 
         <!-- Empleados -->
         <div class="section">
-            <h2><span class="icon">👥</span>Empleados</h2>
+            <h2><span class="icon">👥</span>Empleado</h2>
             <div id="employeesContainer">
                 <div class="employee-section">
                     <!-- Información Personal -->
@@ -124,31 +131,40 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Número de Documento</label>
-                                <input type="text" class="documentNumber" placeholder="1063279307">
+                                <label for="documentNumber">
+                                    Número de Documento <span class="required">*</span>
+                                </label>
+                                <input type="text" class="documentNumber" required placeholder="12345678">
                             </div>
-                        </div>
-                        
-                        <div class="form-row">
+                            
                             <div class="form-group">
-                                <label>Primer Apellido</label>
-                                <input type="text" class="firstSurname" placeholder="Perez">
+                                <label for="firstName">
+                                    Primer Nombre <span class="required">*</span>
+                                </label>
+                                <input type="text" class="firstName" required placeholder="Juan">
                             </div>
+                            
                             <div class="form-group">
-                                <label>Segundo Apellido</label>
-                                <input type="text" class="secondSurname" placeholder="Gomez">
+                                <label for="otherNames">
+                                    Segundo Nombre
+                                </label>
+                                <input type="text" class="otherNames" placeholder="Carlos">
                             </div>
-                        </div>
-                        
-                        <div class="form-row">
+                            
                             <div class="form-group">
-                                <label>Primer Nombre</label>
-                                <input type="text" class="firstName" placeholder="Pedro">
+                                <label for="firstSurname">
+                                    Primer Apellido <span class="required">*</span>
+                                </label>
+                                <input type="text" class="firstSurname" required placeholder="Pérez">
                             </div>
+                            
                             <div class="form-group">
-                                <label>Segundo Nombre</label>
-                                <input type="text" class="otherNames" placeholder="">
+                                <label for="secondSurname">
+                                    Segundo Apellido
+                                </label>
+                                <input type="text" class="secondSurname" placeholder="González">
                             </div>
+
                         </div>
                     </div>
 
@@ -172,8 +188,10 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Dirección de Trabajo</label>
-                                <input type="text" class="workAddress" placeholder="Calle 64 #1631 La Capilla">
+                                <label>
+                                    Dirección de Trabajo <span class="required">*</span>
+                                </label>
+                                <input type="text" class="workAddress" required placeholder="Calle 64 #1631 La Capilla">
                             </div>
                             <div class="form-group">
                                 <label>Tipo de Contrato</label>
@@ -184,12 +202,16 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Salario</label>
-                                <input type="number" class="salary" placeholder="1200000">
+                                <label for="salary">
+                                    Salario <span class="required">*</span>
+                                </label>
+                                <input type="number" class="salary" required placeholder="1200000">
                             </div>
                             <div class="form-group">
-                                <label>Código de Trabajador</label>
-                                <input type="text" class="workerCode" placeholder="1063279307">
+                                <label for="workerCode">
+                                    Código del Trabajador <span class="required">*</span>
+                                </label>
+                                <input type="text" class="workerCode" required placeholder="EMP001">
                             </div>
                             <div class="form-group">
                                 <label>¿Salario Integral?</label>
@@ -216,7 +238,6 @@
                                 <label>Método de Pago</label>
                                 <select class="paymentMethodId">
                                     <option value="1" selected>Contado</option>
-                                    <option value="2">Crédito</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -227,8 +248,10 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Banco</label>
-                                <input type="text" class="bank" placeholder="BANCOLOMBIA">
+                                <label for="bank">
+                                    Banco <span class="required">*</span>
+                                </label>
+                                <input type="text" class="bank" required placeholder="Bancolombia">
                             </div>
                             <div class="form-group">
                                 <label>Tipo de Cuenta</label>
@@ -238,8 +261,10 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Número de Cuenta</label>
-                                <input type="text" class="accountNumber" placeholder="96645544844">
+                                <label for="accountNumber">
+                                    Número de Cuenta <span class="required">*</span>
+                                </label>
+                                <input type="text" class="accountNumber" required placeholder="123456789">
                             </div>
                         </div>
                     </div>
@@ -265,7 +290,10 @@
                         <h4>Auxilio de Transporte</h4>
                         <div class="form-row-3">
                             <div class="form-group">
-                                <label>Auxilio de Transporte</label>
+                                <label>
+                                    Auxilio de Transporte
+                                    <span class="info-icon" title="El valor colocado en este campo es el que se pago en el periodo seleccionado">ℹ️</span>
+                                </label>
                                 <input type="number" class="transportationAssistance">
                             </div>
                             <div class="form-group">
@@ -291,6 +319,57 @@
                             <div class="form-group">
                                 <label>Otros Conceptos Salariales</label>
                                 <input type="number" class="conceptS" placeholder="0" value="0">
+                            </div>
+                        </div>
+
+                        <!-- Horas Extras Diurnas -->
+                        <h4>Horas Extras Diurnas (HED)</h4>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label>Cantidad de Horas</label>
+                                <input type="number" class="hedAmount" placeholder="0" value="0" min="0" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label>% Recargo</label>
+                                <input type="number" class="hedPercentage" placeholder="25" value="25" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Valor a Pagar</label>
+                                <input type="number" class="hedPayment" placeholder="0" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Horas Extras Nocturnas -->
+                        <h4>Horas Extras Nocturnas (HEN)</h4>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label>Cantidad de Horas</label>
+                                <input type="number" class="henAmount" placeholder="0" value="0" min="0" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label>% Recargo</label>
+                                <input type="number" class="henPercentage" placeholder="75" value="75" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Valor a Pagar</label>
+                                <input type="number" class="henPayment" placeholder="0" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Horas Extras Dominicales y Festivos -->
+                        <h4>Horas Extras Dominicales y Festivos (HEDF)</h4>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label>Cantidad de Horas</label>
+                                <input type="number" class="hedfAmount" placeholder="0" value="0" min="0" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label>% Recargo</label>
+                                <input type="number" class="hedfPercentage" placeholder="100" value="100" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Valor a Pagar</label>
+                                <input type="number" class="hedfPayment" placeholder="0" readonly>
                             </div>
                         </div>
                     </div>
@@ -326,6 +405,61 @@
                             <div class="form-group">
                                 <label>Otras Deducciones</label>
                                 <input type="number" class="otherDeduction" placeholder="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen de Pagos -->
+                <div class="subsection">
+                    <h3>📊 Resumen de Liquidación</h3>
+                    <div class="payment-summary">
+                        <div class="summary-card devengados">
+                            <h4>💰 Devengados</h4>
+                            <div class="summary-row">
+                                <span>Salario Trabajado:</span>
+                                <span class="summary-salaryWorked">$0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Horas Extras:</span>
+                                <span class="summary-overtime">$0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Auxilio Transporte:</span>
+                                <span class="summary-transport">$0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Otros Conceptos:</span>
+                                <span class="summary-others">$0</span>
+                            </div>
+                            <div class="summary-total">
+                                <strong>Total Devengado: <span class="summary-totalEarned">$0</span></strong>
+                            </div>
+                        </div>
+
+                        <div class="summary-card deducciones">
+                            <h4>📉 Deducciones</h4>
+                            <div class="summary-row">
+                                <span>Salud (4%):</span>
+                                <span class="summary-health">$0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Pensión (4%):</span>
+                                <span class="summary-pension">$0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Otras Deducciones:</span>
+                                <span class="summary-otherDeductions">$0</span>
+                            </div>
+                            <div class="summary-total">
+                                <strong>Total Deducciones: <span class="summary-totalDeductions">$0</span></strong>
+                            </div>
+                        </div>
+
+                        <div class="summary-card total-final">
+                            <h4>🎯 Neto a Pagar</h4>
+                            <div class="final-amount">
+                                <span class="summary-netPay">$0</span>
                             </div>
                         </div>
                     </div>

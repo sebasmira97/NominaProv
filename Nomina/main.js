@@ -128,66 +128,90 @@ window.reloadCities = reloadCities;
 
 function setupCalculations(employeeDiv) {
     const salaryInput = employeeDiv.querySelector('.salary');
+    const workedDaysInput = employeeDiv.querySelector('.workedDays');
     const salaryWorkedInput = employeeDiv.querySelector('.salaryWorked');
     const healthPercentageInput = employeeDiv.querySelector('.healthPercentage');
     const healthDeductionInput = employeeDiv.querySelector('.healthDeduction');
     const pensionPercentageInput = employeeDiv.querySelector('.pensionPercentage');
     const pensionDeductionInput = employeeDiv.querySelector('.pensionDeduction');
     
-    function calculateDeductions() {
-        const salaryWorked = parseFloat(salaryWorkedInput.value) || 0;
-        const healthPercentage = parseFloat(healthPercentageInput.value) || 4;
-        const pensionPercentage = parseFloat(pensionPercentageInput.value) || 4;
+    // Campos para horas extras
+    const hedAmountInput = employeeDiv.querySelector('.hedAmount');
+    const hedPercentageInput = employeeDiv.querySelector('.hedPercentage');
+    const hedPaymentInput = employeeDiv.querySelector('.hedPayment');
+    
+    const henAmountInput = employeeDiv.querySelector('.henAmount');
+    const henPercentageInput = employeeDiv.querySelector('.henPercentage');
+    const henPaymentInput = employeeDiv.querySelector('.henPayment');
+    
+    const hedfAmountInput = employeeDiv.querySelector('.hedfAmount');
+    const hedfPercentageInput = employeeDiv.querySelector('.hedfPercentage');
+    const hedfPaymentInput = employeeDiv.querySelector('.hedfPayment');
+
+    function calculateAll() {
+        const salary = parseFloat(salaryInput?.value) || 0;
+        const workedDays = parseFloat(workedDaysInput?.value) || 30;
+        const healthPercentage = parseFloat(healthPercentageInput?.value) || 4;
+        const pensionPercentage = parseFloat(pensionPercentageInput?.value) || 4;
         
-        healthDeductionInput.value = Math.round(salaryWorked * healthPercentage / 100);
-        pensionDeductionInput.value = Math.round(salaryWorked * pensionPercentage / 100);
+        // Calcular salario trabajado
+        const salaryWorked = salary > 0 ? Math.round((salary / 30) * workedDays) : 0;
+        if (salaryWorkedInput) salaryWorkedInput.value = salaryWorked;
+        
+        // Valor hora base (220 horas mensuales = 30 días x 8 horas)
+        const valorHora = salary > 0 ? salary / 220 : 0;
+        
+        // Calcular HED (Horas Extras Diurnas)
+        const hedAmount = parseFloat(hedAmountInput?.value) || 0;
+        const hedPercentage = parseFloat(hedPercentageInput?.value) || 25;
+        const hedPayment = hedAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (1 + hedPercentage / 100) * hedAmount) : 0;
+        if (hedPaymentInput) hedPaymentInput.value = hedPayment;
+        
+        // Calcular HEN (Horas Extras Nocturnas)
+        const henAmount = parseFloat(henAmountInput?.value) || 0;
+        const henPercentage = parseFloat(henPercentageInput?.value) || 75;
+        const henPayment = henAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (1 + henPercentage / 100) * henAmount) : 0;
+        if (henPaymentInput) henPaymentInput.value = henPayment;
+        
+        // Calcular HEDF (Horas Extras Dominicales y Festivos)
+        const hedfAmount = parseFloat(hedfAmountInput?.value) || 0;
+        const hedfPercentage = parseFloat(hedfPercentageInput?.value) || 100;
+        const hedfPayment = hedfAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (1 + hedfPercentage / 100) * hedfAmount) : 0;
+        if (hedfPaymentInput) hedfPaymentInput.value = hedfPayment;
+        
+        // Calcular deducciones sobre salario trabajado
+        const healthDeduction = Math.round(salaryWorked * healthPercentage / 100);
+        const pensionDeduction = Math.round(salaryWorked * pensionPercentage / 100);
+        
+        if (healthDeductionInput) healthDeductionInput.value = healthDeduction;
+        if (pensionDeductionInput) pensionDeductionInput.value = pensionDeduction;
     }
 
-    // Calcular salario trabajado automáticamente
-    function calculateSalaryWorked() {
-        const salary = parseFloat(salaryInput.value) || 0;
-        const workedDaysInput = employeeDiv.querySelector('.workedDays');
-        const workedDays = parseFloat(workedDaysInput?.value) || 0;
-        if (salary > 0 && workedDays > 0) {
-            salaryWorkedInput.value = Math.round((salary / 30) * workedDays);
-        } else {
-            salaryWorkedInput.value = '';
+    // Eventos para recalcular automáticamente
+    [salaryInput, workedDaysInput, healthPercentageInput, pensionPercentageInput, 
+     hedAmountInput, hedPercentageInput, henAmountInput, henPercentageInput,
+     hedfAmountInput, hedfPercentageInput].forEach(input => {
+        if (input) {
+            input.addEventListener('input', calculateAll);
         }
-    }
-
-    salaryInput.addEventListener('input', () => {
-        calculateSalaryWorked();
-        calculateDeductions();
     });
-    healthPercentageInput.addEventListener('input', calculateDeductions);
-    pensionPercentageInput.addEventListener('input', calculateDeductions);
-
-    // También recalcular salario trabajado cuando cambian los días trabajados
-    const workedDaysInput = employeeDiv.querySelector('.workedDays');
-    if (workedDaysInput) {
-        workedDaysInput.addEventListener('input', () => {
-            calculateSalaryWorked();
-            calculateDeductions();
-        });
-    }
-
-    // También recalcular deducciones cuando cambia el salario trabajado
-    salaryWorkedInput.addEventListener('input', calculateDeductions);
 
     // Calcular inicialmente
-    calculateSalaryWorked();
-    calculateDeductions();
+    calculateAll();
 }
 
 function generateEmployeeJSON(employeeDiv) {
     const getVal = (selector, defaultVal = '') => {
         const element = employeeDiv.querySelector(selector);
-        return element ? element.value || defaultVal : defaultVal;
+        return element ? element.value.trim() : defaultVal;
     };
     
     const getNumVal = (selector, defaultVal = 0) => {
-        const val = getVal(selector);
-        return val === '' ? defaultVal : parseFloat(val) || defaultVal;
+        const val = parseFloat(getVal(selector));
+        return isNaN(val) ? defaultVal : val;
     };
 
     const getCurrentTime = () => {
@@ -199,25 +223,42 @@ function generateEmployeeJSON(employeeDiv) {
     
     const salary = getNumVal('.salary');
     const workedDays = getNumVal('.workedDays', 30);
+    
+    // Horas extras - OBTENER VALORES REALES DEL FORMULARIO
     const hedAmount = getNumVal('.hedAmount');
     const hedPercentage = getNumVal('.hedPercentage', 25);
+    const hedPayment = getNumVal('.hedPayment');
+    
+    const henAmount = getNumVal('.henAmount');
+    const henPercentage = getNumVal('.henPercentage', 75);
+    const henPayment = getNumVal('.henPayment');
+    
+    const hedfAmount = getNumVal('.hedfAmount');
+    const hedfPercentage = getNumVal('.hedfPercentage', 100);
+    const hedfPayment = getNumVal('.hedfPayment');
+    
+    // Otros conceptos
     const transportationAssistance = getNumVal('.transportationAssistance');
     const bonusPayment = getNumVal('.bonusPayment');
     const commission = getNumVal('.commission');
     const conceptS = getNumVal('.conceptS');
     
-    // Calcular total devengado
-    const hedPayment = hedAmount > 0 ? Math.round((salary / 240) * (hedPercentage / 100) * hedAmount * salary / 1000) : 0;
-    const totalEarned = salary + transportationAssistance + hedPayment + bonusPayment + commission + conceptS;
+    // Calcular total horas extras
+    const totalOvertimePayment = hedPayment + henPayment + hedfPayment;
     
-    const healthDeduction = Math.round(salary * getNumVal('.healthPercentage', 4) / 100);
-    const pensionDeduction = Math.round(salary * getNumVal('.pensionPercentage', 4) / 100);
+    // Calcular total devengado
+    const salaryWorked = getNumVal('.salaryWorked');
+    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + commission + conceptS;
+    
+    // Deducciones
+    const healthDeduction = getNumVal('.healthDeduction');
+    const pensionDeduction = getNumVal('.pensionDeduction');
     const thirdPartyPay = getNumVal('.thirdPartyPay');
     const otherDeduction = getNumVal('.otherDeduction');
     
     const totalDeductions = healthDeduction + pensionDeduction + thirdPartyPay + otherDeduction;
     const totalVoucher = totalEarned - totalDeductions;
-    
+
     return {
         "resolution_number": document.getElementById('resolutionNumber').value || "18760000001",
         "document_number": document.getElementById('documentNumber').value || "27",
@@ -247,10 +288,10 @@ function generateEmployeeJSON(employeeDiv) {
             "high_risk_pension": getVal('.highRiskPension', 'false'),
             "identity_document_id": getVal('.identityDocumentId', '1'),
             "document_number": getVal('.documentNumber'),
-            "first_surname": getVal('.firstSurname'),
-            "second_surname": getVal('.secondSurname'),
-            "first_name": getVal('.firstName'),
-            "other_names": getVal('.otherNames'),
+            "first_surname": getVal('.firstSurname'),           // ← Primer apellido (obligatorio)
+            "second_surname": getVal('.secondSurname'),         // ← Segundo apellido (opcional)
+            "first_name": getVal('.firstName'),                 // ← Primer nombre (obligatorio)
+            "other_names": getVal('.otherNames'),               // ← Segundo nombre (opcional)
             "working_country_id": getNumVal('.workingCountryId', 45),
             "work_city_id": getNumVal('.workCityId'),
             "work_address": getVal('.workAddress'),
@@ -280,18 +321,18 @@ function generateEmployeeJSON(employeeDiv) {
                 {
                     "start_time": "2021-12-31T00:00:00",
                     "final_hour": "2021-12-31T00:00:00",
-                    "amount": "0",
-                    "percentage": "0.00",
-                    "payment": "0.00"
+                    "amount": hedAmount.toString(),
+                    "percentage": hedPercentage.toFixed(2),
+                    "payment": hedPayment.toFixed(2)
                 }
             ],
             "HENs": [
                 {
                     "start_time": "2021-12-31T00:00:00",
                     "final_hour": "2021-12-31T00:00:00",
-                    "amount": "0",
-                    "percentage": "0.00",
-                    "payment": "0.00"
+                    "amount": henAmount.toString(),
+                    "percentage": henPercentage.toFixed(2),
+                    "payment": henPayment.toFixed(2)
                 }
             ],
             "HRNs": [
@@ -307,9 +348,9 @@ function generateEmployeeJSON(employeeDiv) {
                 {
                     "start_time": "2021-12-31T00:00:00",
                     "final_hour": "2021-12-31T00:00:00",
-                    "amount": "0",
-                    "percentage": "0.00",
-                    "payment": "0.00"
+                    "amount": hedfAmount.toString(),
+                    "percentage": hedfPercentage.toFixed(2),
+                    "payment": hedfPayment.toFixed(2)
                 }
             ],
             "HRDDFs": [
@@ -536,9 +577,16 @@ function updatePreview() {
 }
 
 function generateJSON() {
+    const validation = validateRequiredFields();
+    
+    if (!validation.isValid) {
+        alert(`Por favor complete los siguientes campos obligatorios:\n• ${validation.errors.join('\n• ')}`);
+        return;
+    }
+
     const employees = document.querySelectorAll('.employee-section');
     if (employees.length === 0) {
-        alert('❌ Por favor agregue al menos un empleado antes de generar el JSON');
+        alert('❌ Por favor agregue al empleado antes de generar el JSON');
         return;
     }
     
@@ -580,49 +628,187 @@ function generateJSON() {
     alert(`✅ Archivos generados exitosamente:\n\n📄 ${filename}\n📄 ${filename.replace('.json', '.txt')}\n\nLos archivos están listos para transmisión de nómina electrónica.`);
 }
 
-// Auto-actualizar vista previa cuando cambian los datos
-document.addEventListener('input', function(e) {
-    if (e.target.matches('input, select')) {
-        setTimeout(updatePreview, 500);
-    }
-});
+// Función para actualizar el resumen de pagos
+function updatePaymentSummary() {
+    const employeeDiv = document.querySelector('.employee-section');
+    if (!employeeDiv) return;
 
-// Inicializar fechas con valores por defecto
-document.addEventListener('DOMContentLoaded', function() {
-    const today = new Date().toISOString().split('T')[0];
-    const firstDay = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-    const lastDay = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0];
-    
-    document.getElementById('payDay').value = today;
-    document.getElementById('generationDate').value = today;
-    document.getElementById('dateEntry').value = '2017-01-01';
-    document.getElementById('settlementStartDate').value = firstDay;
-    document.getElementById('settlementEndDate').value = lastDay;
-    
-    // Inicializar ciudades desde la API
-    initializeCities();
+    const getNumVal = (selector) => {
+        const element = employeeDiv.querySelector(selector);
+        return parseFloat(element?.value) || 0;
+    };
 
-    // Inicializar cálculos automáticos para el único empleado
-    const unicoEmpleado = document.querySelector('.employee-section');
-    if (unicoEmpleado) {
-        setupCalculations(unicoEmpleado);
-    }
-});
+    // Devengados
+    const salaryWorked = getNumVal('.salaryWorked');
+    const hedPayment = getNumVal('.hedPayment');
+    const henPayment = getNumVal('.henPayment');
+    const hedfPayment = getNumVal('.hedfPayment');
+    const totalOvertime = hedPayment + henPayment + hedfPayment;
+    const transportationAssistance = getNumVal('.transportationAssistance');
+    const bonusPayment = getNumVal('.bonusPayment');
+    const commission = getNumVal('.commission');
+    const conceptS = getNumVal('.conceptS');
+    const otherConcepts = bonusPayment + commission + conceptS;
+    const totalEarned = salaryWorked + totalOvertime + transportationAssistance + otherConcepts;
 
-// Función para inicializar las ciudades
-async function initializeCities() {
-    const API_URL = 'https://api-v2.matias-api.com/api/ubl2.1/cities';
-    try {
-        // Ciudad de Generación
-        await convertCityInputToSelect(API_URL);
-        // Ciudad de Trabajo
-        await convertWorkCityInputToSelect(API_URL);
-    } catch (error) {
-        console.error('Error inicializando ciudades:', error);
-    }
+    // Deducciones
+    const healthDeduction = getNumVal('.healthDeduction');
+    const pensionDeduction = getNumVal('.pensionDeduction');
+    const thirdPartyPay = getNumVal('.thirdPartyPay');
+    const otherDeduction = getNumVal('.otherDeduction');
+    const otherDeductions = thirdPartyPay + otherDeduction;
+    const totalDeductions = healthDeduction + pensionDeduction + otherDeductions;
+
+    // Neto a pagar
+    const netPay = totalEarned - totalDeductions;
+
+    // Actualizar resumen
+    const formatCurrency = (value) => new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0
+    }).format(value);
+
+    // Devengados
+    document.querySelector('.summary-salaryWorked').textContent = formatCurrency(salaryWorked);
+    document.querySelector('.summary-overtime').textContent = formatCurrency(totalOvertime);
+    document.querySelector('.summary-transport').textContent = formatCurrency(transportationAssistance);
+    document.querySelector('.summary-others').textContent = formatCurrency(otherConcepts);
+    document.querySelector('.summary-totalEarned').textContent = formatCurrency(totalEarned);
+
+    // Deducciones
+    document.querySelector('.summary-health').textContent = formatCurrency(healthDeduction);
+    document.querySelector('.summary-pension').textContent = formatCurrency(pensionDeduction);
+    document.querySelector('.summary-otherDeductions').textContent = formatCurrency(otherDeductions);
+    document.querySelector('.summary-totalDeductions').textContent = formatCurrency(totalDeductions);
+
+    // Neto
+    document.querySelector('.summary-netPay').textContent = formatCurrency(netPay);
 }
 
-// Función para convertir input de ciudad de trabajo a select
+// Función para validar campos obligatorios
+function validateRequiredFields() {
+    const requiredSelectors = [
+        '.documentNumber',
+        '.firstName', 
+        '.firstSurname',
+        '.salary',
+        '.workerCode',
+        '.bank',
+        '.accountNumber',
+        '.workAddress'  // ← Campo agregado
+    ];
+
+    let isValid = true;
+    const errors = [];
+
+    requiredSelectors.forEach(selector => {
+        const field = document.querySelector(selector);
+        const formGroup = field?.closest('.form-group');
+        
+        if (field && formGroup) {
+            // Remover errores previos
+            formGroup.classList.remove('has-error');
+            const existingError = formGroup.querySelector('.error-message');
+            if (existingError) existingError.remove();
+
+            // Validar campo
+            if (!field.value.trim()) {
+                isValid = false;
+                const fieldName = field.closest('.form-group').querySelector('label').textContent.replace('*', '').trim();
+                errors.push(fieldName);
+                
+                formGroup.classList.add('has-error');
+                const errorMsg = document.createElement('span');
+                errorMsg.className = 'error-message';
+                errorMsg.textContent = 'Este campo es obligatorio';
+                field.parentNode.appendChild(errorMsg);
+            }
+        }
+    });
+
+    return { isValid, errors };
+}
+
+// Actualizar función setupCalculations para incluir el resumen
+function setupCalculations(employeeDiv) {
+    const salaryInput = employeeDiv.querySelector('.salary');
+    const workedDaysInput = employeeDiv.querySelector('.workedDays');
+    const salaryWorkedInput = employeeDiv.querySelector('.salaryWorked');
+    const healthPercentageInput = employeeDiv.querySelector('.healthPercentage');
+    const healthDeductionInput = employeeDiv.querySelector('.healthDeduction');
+    const pensionPercentageInput = employeeDiv.querySelector('.pensionPercentage');
+    const pensionDeductionInput = employeeDiv.querySelector('.pensionDeduction');
+    
+    // Campos para horas extras
+    const hedAmountInput = employeeDiv.querySelector('.hedAmount');
+    const hedPercentageInput = employeeDiv.querySelector('.hedPercentage');
+    const hedPaymentInput = employeeDiv.querySelector('.hedPayment');
+    
+    const henAmountInput = employeeDiv.querySelector('.henAmount');
+    const henPercentageInput = employeeDiv.querySelector('.henPercentage');
+    const henPaymentInput = employeeDiv.querySelector('.henPayment');
+    
+    const hedfAmountInput = employeeDiv.querySelector('.hedfAmount');
+    const hedfPercentageInput = employeeDiv.querySelector('.hedfPercentage');
+    const hedfPaymentInput = employeeDiv.querySelector('.hedfPayment');
+
+    function calculateAll() {
+        const salary = parseFloat(salaryInput?.value) || 0;
+        const workedDays = parseFloat(workedDaysInput?.value) || 30;
+        const healthPercentage = parseFloat(healthPercentageInput?.value) || 4;
+        const pensionPercentage = parseFloat(pensionPercentageInput?.value) || 4;
+        
+        // Calcular salario trabajado
+        const salaryWorked = salary > 0 ? Math.round((salary / 30) * workedDays) : 0;
+        if (salaryWorkedInput) salaryWorkedInput.value = salaryWorked;
+        
+        // Valor hora base (220 horas mensuales = 30 días x 8 horas)
+        const valorHora = salary > 0 ? salary / 220 : 0;
+        
+        // Calcular HED (Horas Extras Diurnas)
+        const hedAmount = parseFloat(hedAmountInput?.value) || 0;
+        const hedPercentage = parseFloat(hedPercentageInput?.value) || 25;
+        const hedPayment = hedAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (1 + hedPercentage / 100) * hedAmount) : 0;
+        if (hedPaymentInput) hedPaymentInput.value = hedPayment;
+        
+        // Calcular HEN (Horas Extras Nocturnas)
+        const henAmount = parseFloat(henAmountInput?.value) || 0;
+        const henPercentage = parseFloat(henPercentageInput?.value) || 75;
+        const henPayment = henAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (1 + henPercentage / 100) * henAmount) : 0;
+        if (henPaymentInput) henPaymentInput.value = henPayment;
+        
+        // Calcular HEDF (Horas Extras Dominicales y Festivos)
+        const hedfAmount = parseFloat(hedfAmountInput?.value) || 0;
+        const hedfPercentage = parseFloat(hedfPercentageInput?.value) || 100;
+        const hedfPayment = hedfAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (1 + hedfPercentage / 100) * hedfAmount) : 0;
+        if (hedfPaymentInput) hedfPaymentInput.value = hedfPayment;
+        
+        // Calcular deducciones sobre salario trabajado
+        const healthDeduction = Math.round(salaryWorked * healthPercentage / 100);
+        const pensionDeduction = Math.round(salaryWorked * pensionPercentage / 100);
+        
+        if (healthDeductionInput) healthDeductionInput.value = healthDeduction;
+        if (pensionDeductionInput) pensionDeductionInput.value = pensionDeduction;
+    }
+
+    // Eventos para recalcular automáticamente
+    [salaryInput, workedDaysInput, healthPercentageInput, pensionPercentageInput, 
+     hedAmountInput, hedPercentageInput, henAmountInput, henPercentageInput,
+     hedfAmountInput, hedfPercentageInput].forEach(input => {
+        if (input) {
+            input.addEventListener('input', calculateAll);
+        }
+    });
+
+    // Calcular inicialmente
+    calculateAll();
+}
+
+// Función para convertir input de ciudad de trabajo a select con datos de la API
 async function convertWorkCityInputToSelect(apiUrl) {
     const workCityInput = document.getElementById('workCityId');
     if (!workCityInput) return;
@@ -763,3 +949,122 @@ async function reloadCities() {
         }
     }
 }
+
+// Función para actualizar tiempo trabajado según el período
+function updateTimeWorkedByPeriod() {
+    const periodSelect = document.getElementById('periodId');
+    const timeWorkedInput = document.getElementById('timeWorked');
+    const workedDaysInputs = document.querySelectorAll('.workedDays');
+    
+    if (!periodSelect || !timeWorkedInput) return;
+    
+    const periodValue = periodSelect.value;
+    let defaultDays = 30; // Valor por defecto
+    
+    switch(periodValue) {
+        case '1': // Diario
+            defaultDays = 1;
+            break;
+        case '2': // Semanal
+            defaultDays = 7;
+            break;
+        case '3': // Decenal
+            defaultDays = 10;
+            break;
+        case '4': // Quincenal
+            defaultDays = 15;
+            break;
+        case '5': // Mensual
+            defaultDays = 30;
+            break;
+        case '6': // Otro (acuerdo especial)
+            defaultDays = 30; // Mantener el valor actual o usar 30 por defecto
+            break;
+    }
+    
+    // Actualizar el campo "Tiempo Trabajado"
+    timeWorkedInput.value = defaultDays;
+    
+    // También actualizar todos los campos "Días Trabajados" de empleados
+    workedDaysInputs.forEach(input => {
+        input.value = defaultDays;
+        // Disparar evento para recalcular salarios
+        input.dispatchEvent(new Event('input'));
+    });
+}
+
+// Evento para detectar cambios en el período
+document.addEventListener('DOMContentLoaded', function() {
+    const periodSelect = document.getElementById('periodId');
+    
+    if (periodSelect) {
+        // Configurar el valor inicial
+        updateTimeWorkedByPeriod();
+        
+        // Escuchar cambios en el select de período
+        periodSelect.addEventListener('change', updateTimeWorkedByPeriod);
+    }
+    
+    // Inicializar ciudades desde la API
+    initializeCities();
+
+    // Inicializar cálculos automáticos para el único empleado
+    const unicoEmpleado = document.querySelector('.employee-section');
+    if (unicoEmpleado) {
+        setupCalculations(unicoEmpleado);
+    }
+});
+
+// Función para inicializar las ciudades
+async function initializeCities() {
+    const API_URL = 'https://api-v2.matias-api.com/api/ubl2.1/cities';
+    try {
+        // Ciudad de Generación
+        await convertCityInputToSelect(API_URL);
+        // Ciudad de Trabajo
+        await convertWorkCityInputToSelect(API_URL);
+    } catch (error) {
+        console.error('Error inicializando ciudades:', error);
+    }
+}
+
+// Auto-actualizar vista previa cuando cambian los datos
+document.addEventListener('input', function(e) {
+    if (e.target.matches('input, select')) {
+        setTimeout(updatePreview, 500);
+    }
+});
+
+// Inicializar fechas con valores por defecto
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const firstDay = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+    const lastDay = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0];
+    
+    document.getElementById('payDay').value = today;
+    document.getElementById('generationDate').value = today;
+    document.getElementById('dateEntry').value = '2017-01-01';
+    document.getElementById('settlementStartDate').value = firstDay;
+    document.getElementById('settlementEndDate').value = lastDay;
+    
+    // Inicializar ciudades desde la API
+    initializeCities();
+
+    // Inicializar cálculos automáticos para el único empleado
+    const unicoEmpleado = document.querySelector('.employee-section');
+    if (unicoEmpleado) {
+        setupCalculations(unicoEmpleado);
+    }
+});
+
+// Función para actualizar resumen
+document.addEventListener('input', function(e) {
+    if (e.target.matches('input[type="number"], input[type="text"]')) {
+        setTimeout(updatePaymentSummary, 100);
+    }
+});
+
+// Inicializar resumen al cargar
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(updatePaymentSummary, 500);
+});
