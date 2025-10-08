@@ -135,7 +135,7 @@ function setupCalculations(employeeDiv) {
     const pensionPercentageInput = employeeDiv.querySelector('.pensionPercentage');
     const pensionDeductionInput = employeeDiv.querySelector('.pensionDeduction');
     
-    // Campos para horas extras
+    // Campos para todos los tipos de horas extras
     const hedAmountInput = employeeDiv.querySelector('.hedAmount');
     const hedPercentageInput = employeeDiv.querySelector('.hedPercentage');
     const hedPaymentInput = employeeDiv.querySelector('.hedPayment');
@@ -147,6 +147,22 @@ function setupCalculations(employeeDiv) {
     const hedfAmountInput = employeeDiv.querySelector('.hedfAmount');
     const hedfPercentageInput = employeeDiv.querySelector('.hedfPercentage');
     const hedfPaymentInput = employeeDiv.querySelector('.hedfPayment');
+    
+    const hrnAmountInput = employeeDiv.querySelector('.hrnAmount');
+    const hrnPercentageInput = employeeDiv.querySelector('.hrnPercentage');
+    const hrnPaymentInput = employeeDiv.querySelector('.hrnPayment');
+    
+    const hrdfAmountInput = employeeDiv.querySelector('.hrdfAmount');
+    const hrdfPercentageInput = employeeDiv.querySelector('.hrdfPercentage');
+    const hrdfPaymentInput = employeeDiv.querySelector('.hrdfPayment');
+    
+    const hendfAmountInput = employeeDiv.querySelector('.hendfAmount');
+    const hendfPercentageInput = employeeDiv.querySelector('.hendfPercentage');
+    const hendfPaymentInput = employeeDiv.querySelector('.hendfPayment');
+    
+    const hrndfAmountInput = employeeDiv.querySelector('.hrndfAmount');
+    const hrndfPercentageInput = employeeDiv.querySelector('.hrndfPercentage');
+    const hrndfPaymentInput = employeeDiv.querySelector('.hrndfPayment');
 
     function calculateAll() {
         const salary = parseFloat(salaryInput?.value) || 0;
@@ -158,29 +174,57 @@ function setupCalculations(employeeDiv) {
         const salaryWorked = salary > 0 ? Math.round((salary / 30) * workedDays) : 0;
         if (salaryWorkedInput) salaryWorkedInput.value = salaryWorked;
         
-        // Valor hora base (220 horas mensuales = 30 días x 8 horas)
-        const valorHora = salary > 0 ? salary / 220 : 0;
+        // Valor hora base (240 horas mensuales = 30 días x 8 horas)
+        const valorHora = salary > 0 ? salary / 240 : 0;
         
-        // Calcular HED (Horas Extras Diurnas)
+        // Calcular HED (Horas Extras Diurnas) - 25%
         const hedAmount = parseFloat(hedAmountInput?.value) || 0;
         const hedPercentage = parseFloat(hedPercentageInput?.value) || 25;
         const hedPayment = hedAmount > 0 && valorHora > 0 ? 
             Math.round(valorHora * (1 + hedPercentage / 100) * hedAmount) : 0;
         if (hedPaymentInput) hedPaymentInput.value = hedPayment;
         
-        // Calcular HEN (Horas Extras Nocturnas)
+        // Calcular HEN (Horas Extras Nocturnas) - 75%
         const henAmount = parseFloat(henAmountInput?.value) || 0;
         const henPercentage = parseFloat(henPercentageInput?.value) || 75;
         const henPayment = henAmount > 0 && valorHora > 0 ? 
             Math.round(valorHora * (1 + henPercentage / 100) * henAmount) : 0;
         if (henPaymentInput) henPaymentInput.value = henPayment;
         
-        // Calcular HEDF (Horas Extras Dominicales y Festivos)
+        // Calcular HEDF (Horas Extras Dominicales y Festivos) - 100%
         const hedfAmount = parseFloat(hedfAmountInput?.value) || 0;
         const hedfPercentage = parseFloat(hedfPercentageInput?.value) || 100;
         const hedfPayment = hedfAmount > 0 && valorHora > 0 ? 
             Math.round(valorHora * (1 + hedfPercentage / 100) * hedfAmount) : 0;
         if (hedfPaymentInput) hedfPaymentInput.value = hedfPayment;
+        
+        // Calcular HRN (Horas Recargo Nocturno) - 35%
+        const hrnAmount = parseFloat(hrnAmountInput?.value) || 0;
+        const hrnPercentage = parseFloat(hrnPercentageInput?.value) || 35;
+        const hrnPayment = hrnAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (hrnPercentage / 100) * hrnAmount) : 0;
+        if (hrnPaymentInput) hrnPaymentInput.value = hrnPayment;
+        
+        // Calcular HRDF (Horas Recargo Dominicales y Festivos) - 75%
+        const hrdfAmount = parseFloat(hrdfAmountInput?.value) || 0;
+        const hrdfPercentage = parseFloat(hrdfPercentageInput?.value) || 75;
+        const hrdfPayment = hrdfAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (hrdfPercentage / 100) * hrdfAmount) : 0;
+        if (hrdfPaymentInput) hrdfPaymentInput.value = hrdfPayment;
+        
+        // Calcular HENDF (Horas Extras Nocturnas Dominicales y Festivos) - 150%
+        const hendfAmount = parseFloat(hendfAmountInput?.value) || 0;
+        const hendfPercentage = parseFloat(hendfPercentageInput?.value) || 150;
+        const hendfPayment = hendfAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (1 + hendfPercentage / 100) * hendfAmount) : 0;
+        if (hendfPaymentInput) hendfPaymentInput.value = hendfPayment;
+        
+        // Calcular HRNDF (Horas Recargo Nocturno Dominicales y Festivos) - 110%
+        const hrndfAmount = parseFloat(hrndfAmountInput?.value) || 0;
+        const hrndfPercentage = parseFloat(hrndfPercentageInput?.value) || 110;
+        const hrndfPayment = hrndfAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (hrndfPercentage / 100) * hrndfAmount) : 0;
+        if (hrndfPaymentInput) hrndfPaymentInput.value = hrndfPayment;
         
         // Calcular deducciones sobre salario trabajado
         const healthDeduction = Math.round(salaryWorked * healthPercentage / 100);
@@ -193,7 +237,9 @@ function setupCalculations(employeeDiv) {
     // Eventos para recalcular automáticamente
     [salaryInput, workedDaysInput, healthPercentageInput, pensionPercentageInput, 
      hedAmountInput, hedPercentageInput, henAmountInput, henPercentageInput,
-     hedfAmountInput, hedfPercentageInput].forEach(input => {
+     hedfAmountInput, hedfPercentageInput, hrnAmountInput, hrnPercentageInput,
+     hrdfAmountInput, hrdfPercentageInput, hendfAmountInput, hendfPercentageInput,
+     hrndfAmountInput, hrndfPercentageInput].forEach(input => {
         if (input) {
             input.addEventListener('input', calculateAll);
         }
@@ -237,14 +283,24 @@ function generateEmployeeJSON(employeeDiv) {
     const hedfPercentage = getNumVal('.hedfPercentage', 100);
     const hedfPayment = getNumVal('.hedfPayment');
     
-    // Otros conceptos
-    const transportationAssistance = getNumVal('.transportationAssistance');
-    const bonusPayment = getNumVal('.bonusPayment');
-    const commission = getNumVal('.commission');
-    const conceptS = getNumVal('.conceptS');
+    const hrnAmount = getNumVal('.hrnAmount');
+    const hrnPercentage = getNumVal('.hrnPercentage', 35);
+    const hrnPayment = getNumVal('.hrnPayment');
+    
+    const hrdfAmount = getNumVal('.hrdfAmount');
+    const hrdfPercentage = getNumVal('.hrdfPercentage', 75);
+    const hrdfPayment = getNumVal('.hrdfPayment');
+    
+    const hendfAmount = getNumVal('.hendfAmount');
+    const hendfPercentage = getNumVal('.hendfPercentage', 150);
+    const hendfPayment = getNumVal('.hendfPayment');
+    
+    const hrndfAmount = getNumVal('.hrndfAmount');
+    const hrndfPercentage = getNumVal('.hrndfPercentage', 110);
+    const hrndfPayment = getNumVal('.hrndfPayment');
     
     // Calcular total horas extras
-    const totalOvertimePayment = hedPayment + henPayment + hedfPayment;
+    const totalOvertimePayment = hedPayment + henPayment + hedfPayment + hrnPayment + hrdfPayment + hendfPayment + hrndfPayment;
     
     // Calcular total devengado
     const salaryWorked = getNumVal('.salaryWorked');
@@ -339,9 +395,9 @@ function generateEmployeeJSON(employeeDiv) {
                 {
                     "start_time": "2021-12-31T00:00:00",
                     "final_hour": "2021-12-31T00:00:00",
-                    "amount": "0",
-                    "percentage": "0.00",
-                    "payment": "0.00"
+                    "amount": hrnAmount.toString(),
+                    "percentage": hrnPercentage.toFixed(2),
+                    "payment": hrnPayment.toFixed(2)
                 }
             ],
             "HEDDFs": [
@@ -357,27 +413,27 @@ function generateEmployeeJSON(employeeDiv) {
                 {
                     "start_time": "2021-12-31T00:00:00",
                     "final_hour": "2021-12-31T00:00:00",
-                    "amount": "0",
-                    "percentage": "0.00",
-                    "payment": "0.00"
+                    "amount": hrdfAmount.toString(),
+                    "percentage": hrdfPercentage.toFixed(2),
+                    "payment": hrdfPayment.toFixed(2)
                 }
             ],
             "HENDFs": [
                 {
                     "start_time": "2021-12-31T00:00:00",
                     "final_hour": "2021-12-31T00:00:00",
-                    "amount": "0",
-                    "percentage": "0.00",
-                    "payment": "0.00"
+                    "amount": hendfAmount.toString(),
+                    "percentage": hendfPercentage.toFixed(2),
+                    "payment": hendfPayment.toFixed(2)
                 }
             ],
             "HRNDFs": [
                 {
                     "start_time": "2021-12-31T00:00:00",
                     "final_hour": "2021-12-31T00:00:00",
-                    "amount": "0",
-                    "percentage": "0.00",
-                    "payment": "0.00"
+                    "amount": hrndfAmount.toString(),
+                    "percentage": hrndfPercentage.toFixed(2),
+                    "payment": hrndfPayment.toFixed(2)
                 }
             ],
             "vacations": {
@@ -640,10 +696,18 @@ function updatePaymentSummary() {
 
     // Devengados
     const salaryWorked = getNumVal('.salaryWorked');
+    
+    // Todas las horas extras
     const hedPayment = getNumVal('.hedPayment');
     const henPayment = getNumVal('.henPayment');
     const hedfPayment = getNumVal('.hedfPayment');
-    const totalOvertime = hedPayment + henPayment + hedfPayment;
+    const hrnPayment = getNumVal('.hrnPayment');
+    const hrdfPayment = getNumVal('.hrdfPayment');
+    const hendfPayment = getNumVal('.hendfPayment');
+    const hrndfPayment = getNumVal('.hrndfPayment');
+    
+    const totalOvertime = hedPayment + henPayment + hedfPayment + hrnPayment + hrdfPayment + hendfPayment + hrndfPayment;
+    
     const transportationAssistance = getNumVal('.transportationAssistance');
     const bonusPayment = getNumVal('.bonusPayment');
     const commission = getNumVal('.commission');
@@ -688,16 +752,23 @@ function updatePaymentSummary() {
 
 // Función para validar campos obligatorios
 function validateRequiredFields() {
-    const requiredSelectors = [
+    const meansPaymentSelect = document.querySelector('.meansPaymentId');
+    const isEffectivo = meansPaymentSelect?.value === '10';
+    
+    // Lista base de campos obligatorios
+    let requiredSelectors = [
         '.documentNumber',
         '.firstName', 
         '.firstSurname',
         '.salary',
         '.workerCode',
-        '.bank',
-        '.accountNumber',
-        '.workAddress'  // ← Campo agregado
+        '.workAddress'
     ];
+    
+    // Solo agregar banco y cuenta si NO es efectivo
+    if (!isEffectivo) {
+        requiredSelectors.push('.bank', '.accountNumber');
+    }
 
     let isValid = true;
     const errors = [];
@@ -712,8 +783,8 @@ function validateRequiredFields() {
             const existingError = formGroup.querySelector('.error-message');
             if (existingError) existingError.remove();
 
-            // Validar campo
-            if (!field.value.trim()) {
+            // Validar campo (solo si no está deshabilitado)
+            if (!field.readOnly && !field.value.trim()) {
                 isValid = false;
                 const fieldName = field.closest('.form-group').querySelector('label').textContent.replace('*', '').trim();
                 errors.push(fieldName);
@@ -740,7 +811,7 @@ function setupCalculations(employeeDiv) {
     const pensionPercentageInput = employeeDiv.querySelector('.pensionPercentage');
     const pensionDeductionInput = employeeDiv.querySelector('.pensionDeduction');
     
-    // Campos para horas extras
+    // Campos para todos los tipos de horas extras
     const hedAmountInput = employeeDiv.querySelector('.hedAmount');
     const hedPercentageInput = employeeDiv.querySelector('.hedPercentage');
     const hedPaymentInput = employeeDiv.querySelector('.hedPayment');
@@ -752,6 +823,22 @@ function setupCalculations(employeeDiv) {
     const hedfAmountInput = employeeDiv.querySelector('.hedfAmount');
     const hedfPercentageInput = employeeDiv.querySelector('.hedfPercentage');
     const hedfPaymentInput = employeeDiv.querySelector('.hedfPayment');
+    
+    const hrnAmountInput = employeeDiv.querySelector('.hrnAmount');
+    const hrnPercentageInput = employeeDiv.querySelector('.hrnPercentage');
+    const hrnPaymentInput = employeeDiv.querySelector('.hrnPayment');
+    
+    const hrdfAmountInput = employeeDiv.querySelector('.hrdfAmount');
+    const hrdfPercentageInput = employeeDiv.querySelector('.hrdfPercentage');
+    const hrdfPaymentInput = employeeDiv.querySelector('.hrdfPayment');
+    
+    const hendfAmountInput = employeeDiv.querySelector('.hendfAmount');
+    const hendfPercentageInput = employeeDiv.querySelector('.hendfPercentage');
+    const hendfPaymentInput = employeeDiv.querySelector('.hendfPayment');
+    
+    const hrndfAmountInput = employeeDiv.querySelector('.hrndfAmount');
+    const hrndfPercentageInput = employeeDiv.querySelector('.hrndfPercentage');
+    const hrndfPaymentInput = employeeDiv.querySelector('.hrndfPayment');
 
     function calculateAll() {
         const salary = parseFloat(salaryInput?.value) || 0;
@@ -763,29 +850,57 @@ function setupCalculations(employeeDiv) {
         const salaryWorked = salary > 0 ? Math.round((salary / 30) * workedDays) : 0;
         if (salaryWorkedInput) salaryWorkedInput.value = salaryWorked;
         
-        // Valor hora base (220 horas mensuales = 30 días x 8 horas)
-        const valorHora = salary > 0 ? salary / 220 : 0;
+        // Valor hora base (240 horas mensuales = 30 días x 8 horas)
+        const valorHora = salary > 0 ? salary / 240 : 0;
         
-        // Calcular HED (Horas Extras Diurnas)
+        // Calcular HED (Horas Extras Diurnas) - 25%
         const hedAmount = parseFloat(hedAmountInput?.value) || 0;
         const hedPercentage = parseFloat(hedPercentageInput?.value) || 25;
         const hedPayment = hedAmount > 0 && valorHora > 0 ? 
             Math.round(valorHora * (1 + hedPercentage / 100) * hedAmount) : 0;
         if (hedPaymentInput) hedPaymentInput.value = hedPayment;
         
-        // Calcular HEN (Horas Extras Nocturnas)
+        // Calcular HEN (Horas Extras Nocturnas) - 75%
         const henAmount = parseFloat(henAmountInput?.value) || 0;
         const henPercentage = parseFloat(henPercentageInput?.value) || 75;
         const henPayment = henAmount > 0 && valorHora > 0 ? 
             Math.round(valorHora * (1 + henPercentage / 100) * henAmount) : 0;
         if (henPaymentInput) henPaymentInput.value = henPayment;
         
-        // Calcular HEDF (Horas Extras Dominicales y Festivos)
+        // Calcular HEDF (Horas Extras Dominicales y Festivos) - 100%
         const hedfAmount = parseFloat(hedfAmountInput?.value) || 0;
         const hedfPercentage = parseFloat(hedfPercentageInput?.value) || 100;
         const hedfPayment = hedfAmount > 0 && valorHora > 0 ? 
             Math.round(valorHora * (1 + hedfPercentage / 100) * hedfAmount) : 0;
         if (hedfPaymentInput) hedfPaymentInput.value = hedfPayment;
+        
+        // Calcular HRN (Horas Recargo Nocturno) - 35%
+        const hrnAmount = parseFloat(hrnAmountInput?.value) || 0;
+        const hrnPercentage = parseFloat(hrnPercentageInput?.value) || 35;
+        const hrnPayment = hrnAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (hrnPercentage / 100) * hrnAmount) : 0;
+        if (hrnPaymentInput) hrnPaymentInput.value = hrnPayment;
+        
+        // Calcular HRDF (Horas Recargo Dominicales y Festivos) - 75%
+        const hrdfAmount = parseFloat(hrdfAmountInput?.value) || 0;
+        const hrdfPercentage = parseFloat(hrdfPercentageInput?.value) || 75;
+        const hrdfPayment = hrdfAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (hrdfPercentage / 100) * hrdfAmount) : 0;
+        if (hrdfPaymentInput) hrdfPaymentInput.value = hrdfPayment;
+        
+        // Calcular HENDF (Horas Extras Nocturnas Dominicales y Festivos) - 150%
+        const hendfAmount = parseFloat(hendfAmountInput?.value) || 0;
+        const hendfPercentage = parseFloat(hendfPercentageInput?.value) || 150;
+        const hendfPayment = hendfAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (1 + hendfPercentage / 100) * hendfAmount) : 0;
+        if (hendfPaymentInput) hendfPaymentInput.value = hendfPayment;
+        
+        // Calcular HRNDF (Horas Recargo Nocturno Dominicales y Festivos) - 110%
+        const hrndfAmount = parseFloat(hrndfAmountInput?.value) || 0;
+        const hrndfPercentage = parseFloat(hrndfPercentageInput?.value) || 110;
+        const hrndfPayment = hrndfAmount > 0 && valorHora > 0 ? 
+            Math.round(valorHora * (hrndfPercentage / 100) * hrndfAmount) : 0;
+        if (hrndfPaymentInput) hrndfPaymentInput.value = hrndfPayment;
         
         // Calcular deducciones sobre salario trabajado
         const healthDeduction = Math.round(salaryWorked * healthPercentage / 100);
@@ -798,7 +913,9 @@ function setupCalculations(employeeDiv) {
     // Eventos para recalcular automáticamente
     [salaryInput, workedDaysInput, healthPercentageInput, pensionPercentageInput, 
      hedAmountInput, hedPercentageInput, henAmountInput, henPercentageInput,
-     hedfAmountInput, hedfPercentageInput].forEach(input => {
+     hedfAmountInput, hedfPercentageInput, hrnAmountInput, hrnPercentageInput,
+     hrdfAmountInput, hrdfPercentageInput, hendfAmountInput, hendfPercentageInput,
+     hrndfAmountInput, hrndfPercentageInput].forEach(input => {
         if (input) {
             input.addEventListener('input', calculateAll);
         }
@@ -1067,4 +1184,84 @@ document.addEventListener('input', function(e) {
 // Inicializar resumen al cargar
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(updatePaymentSummary, 500);
+});
+
+// Función para manejar cambios en el medio de pago
+function handlePaymentMethodChange() {
+    const meansPaymentSelect = document.querySelector('.meansPaymentId');
+    const bankInput = document.querySelector('.bank');
+    const accountNumberInput = document.querySelector('.accountNumber');
+    const accountTypeSelect = document.querySelector('.accountType');
+    const bankRequired = document.querySelector('.bank-required');
+    const accountRequired = document.querySelector('.account-required');
+    
+    if (!meansPaymentSelect) return;
+    
+    const selectedValue = meansPaymentSelect.value;
+    
+    if (selectedValue === '10') { // Efectivo
+        // Configurar valores automáticos para efectivo
+        if (bankInput) {
+            bankInput.value = 'NO APLICA';
+            bankInput.readOnly = true;
+            bankInput.removeAttribute('required');
+            bankInput.style.backgroundColor = '#f5f5f5';
+        }
+        
+        if (accountNumberInput) {
+            accountNumberInput.value = '00000';
+            accountNumberInput.readOnly = true;
+            accountNumberInput.removeAttribute('required');
+            accountNumberInput.style.backgroundColor = '#f5f5f5';
+        }
+        
+        if (accountTypeSelect) {
+            accountTypeSelect.value = 'AHORROS';
+            accountTypeSelect.disabled = true;
+            accountTypeSelect.style.backgroundColor = '#f5f5f5';
+        }
+        
+        // Ocultar asteriscos de obligatorio
+        if (bankRequired) bankRequired.style.display = 'none';
+        if (accountRequired) accountRequired.style.display = 'none';
+        
+    } else { // Débito bancario
+        // Restaurar campos editables para débito bancario
+        if (bankInput) {
+            bankInput.value = '';
+            bankInput.readOnly = false;
+            bankInput.setAttribute('required', '');
+            bankInput.style.backgroundColor = '';
+            bankInput.placeholder = 'Bancolombia';
+        }
+        
+        if (accountNumberInput) {
+            accountNumberInput.value = '';
+            accountNumberInput.readOnly = false;
+            accountNumberInput.setAttribute('required', '');
+            accountNumberInput.style.backgroundColor = '';
+            accountNumberInput.placeholder = '123456789';
+        }
+        
+        if (accountTypeSelect) {
+            accountTypeSelect.disabled = false;
+            accountTypeSelect.style.backgroundColor = '';
+        }
+        
+        // Mostrar asteriscos de obligatorio
+        if (bankRequired) bankRequired.style.display = 'inline';
+        if (accountRequired) accountRequired.style.display = 'inline';
+    }
+}
+
+// Evento para detectar cambios en el medio de pago
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar evento para medio de pago
+    const meansPaymentSelect = document.querySelector('.meansPaymentId');
+    if (meansPaymentSelect) {
+        meansPaymentSelect.addEventListener('change', handlePaymentMethodChange);
+        
+        // Aplicar configuración inicial
+        handlePaymentMethodChange();
+    }
 });

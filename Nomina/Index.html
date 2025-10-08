@@ -243,13 +243,14 @@
                             <div class="form-group">
                                 <label>Medio de Pago</label>
                                 <select class="meansPaymentId">
+                                    <option value="10">Efectivo</option>
                                     <option value="31">Débito de cuenta corriente</option>
                                     <option value="42" selected>Débito de cuenta de ahorros</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="bank">
-                                    Banco <span class="required">*</span>
+                                    Banco <span class="required bank-required">*</span>
                                 </label>
                                 <input type="text" class="bank" required placeholder="Bancolombia">
                             </div>
@@ -262,7 +263,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="accountNumber">
-                                    Número de Cuenta <span class="required">*</span>
+                                    Número de Cuenta <span class="required account-required">*</span>
                                 </label>
                                 <input type="text" class="accountNumber" required placeholder="123456789">
                             </div>
@@ -370,6 +371,74 @@
                             <div class="form-group">
                                 <label>Valor a Pagar</label>
                                 <input type="number" class="hedfPayment" placeholder="0" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Horas Recargo Nocturno -->
+                        <h4>Horas Recargo Nocturno (HRN)</h4>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label>Cantidad de Horas</label>
+                                <input type="number" class="hrnAmount" placeholder="0" value="0" min="0" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label>% Recargo</label>
+                                <input type="number" class="hrnPercentage" placeholder="35" value="35" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Valor a Pagar</label>
+                                <input type="number" class="hrnPayment" placeholder="0" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Horas Recargo Dominicales y Festivos -->
+                        <h4>Horas Recargo Dominicales y Festivos (HRDF)</h4>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label>Cantidad de Horas</label>
+                                <input type="number" class="hrdfAmount" placeholder="0" value="0" min="0" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label>% Recargo</label>
+                                <input type="number" class="hrdfPercentage" placeholder="75" value="75" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Valor a Pagar</label>
+                                <input type="number" class="hrdfPayment" placeholder="0" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Horas Extras Nocturnas Dominicales y Festivos -->
+                        <h4>Horas Extras Nocturnas Dominicales y Festivos (HENDF)</h4>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label>Cantidad de Horas</label>
+                                <input type="number" class="hendfAmount" placeholder="0" value="0" min="0" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label>% Recargo</label>
+                                <input type="number" class="hendfPercentage" placeholder="150" value="150" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Valor a Pagar</label>
+                                <input type="number" class="hendfPayment" placeholder="0" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Horas Recargo Nocturno Dominicales y Festivos -->
+                        <h4>Horas Recargo Nocturno Dominicales y Festivos (HRNDF)</h4>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label>Cantidad de Horas</label>
+                                <input type="number" class="hrndfAmount" placeholder="0" value="0" min="0" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label>% Recargo</label>
+                                <input type="number" class="hrndfPercentage" placeholder="110" value="110" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Valor a Pagar</label>
+                                <input type="number" class="hrndfPayment" placeholder="0" readonly>
                             </div>
                         </div>
                     </div>
