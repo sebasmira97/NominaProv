@@ -1286,18 +1286,18 @@ function setupCalculations(employeeDiv) {
         const salaryWorked = salary > 0 ? Math.round((salary / 30) * workedDays) : 0;
         if (salaryWorkedInput) salaryWorkedInput.value = salaryWorked;
         
-        // Valor hora base (240 horas mensuales = 30 días x 8 horas)
-        const valorHora = salary > 0 ? salary / 240 : 0;
+        // Valor hora base (220 horas mensuales = 30 días x 8 horas)
+        const valorHora = salary > 0 ? salary / 220 : 0;
         
         // Calcular todas las horas extras
         const calculations = [
             { amount: hedAmountInput, percentage: hedPercentageInput, payment: hedPaymentInput, defaultPercent: 25, type: 'extra' },
             { amount: henAmountInput, percentage: henPercentageInput, payment: henPaymentInput, defaultPercent: 75, type: 'extra' },
-            { amount: hedfAmountInput, percentage: hedfPercentageInput, payment: hedfPaymentInput, defaultPercent: 100, type: 'extra' },
+            { amount: hedfAmountInput, percentage: hedfPercentageInput, payment: hedfPaymentInput, defaultPercent: 105, type: 'extra' },
             { amount: hrnAmountInput, percentage: hrnPercentageInput, payment: hrnPaymentInput, defaultPercent: 35, type: 'recargo' },
-            { amount: hrdfAmountInput, percentage: hrdfPercentageInput, payment: hrdfPaymentInput, defaultPercent: 75, type: 'recargo' },
-            { amount: hendfAmountInput, percentage: hendfPercentageInput, payment: hendfPaymentInput, defaultPercent: 150, type: 'extra' },
-            { amount: hrndfAmountInput, percentage: hrndfPercentageInput, payment: hrndfPaymentInput, defaultPercent: 110, type: 'recargo' }
+            { amount: hrdfAmountInput, percentage: hrdfPercentageInput, payment: hrdfPaymentInput, defaultPercent: 80, type: 'recargo' },
+            { amount: hendfAmountInput, percentage: hendfPercentageInput, payment: hendfPaymentInput, defaultPercent: 155, type: 'extra' },
+            { amount: hrndfAmountInput, percentage: hrndfPercentageInput, payment: hrndfPaymentInput, defaultPercent: 115, type: 'recargo' }
         ];
 
         calculations.forEach(calc => {
