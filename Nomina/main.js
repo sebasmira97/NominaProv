@@ -304,7 +304,8 @@ function generateEmployeeJSON(employeeDiv) {
     
     // Calcular total devengado
     const salaryWorked = getNumVal('.salaryWorked');
-    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + commission + conceptS;
+    const otherConcepts = bonusPayment + primePayment + commission + conceptS;
+    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + otherConcepts;
     
     // Deducciones
     const healthDeduction = getNumVal('.healthDeduction');
@@ -451,7 +452,7 @@ function generateEmployeeJSON(employeeDiv) {
             "bonus": {
                 "amount": "0",
                 "payment": bonusPayment.toFixed(2),
-                "non_salary_payment": "0.00"
+                "non_salary_payment": primePayment.toFixed(2)
             },
             "cesantias": {
                 "payment": "0",
@@ -489,7 +490,7 @@ function generateEmployeeJSON(employeeDiv) {
             "bonuses": [
                 {
                     "bonusS": bonusPayment.toFixed(2),
-                    "bonusNS": "0.00"
+                    "bonusNS": primePayment.toFixed(2)
                 }
             ],
             "assistances": [
@@ -710,9 +711,10 @@ function updatePaymentSummary() {
     
     const transportationAssistance = getNumVal('.transportationAssistance');
     const bonusPayment = getNumVal('.bonusPayment');
+    const primePayment = getNumVal('.primePayment');
     const commission = getNumVal('.commission');
     const conceptS = getNumVal('.conceptS');
-    const otherConcepts = bonusPayment + commission + conceptS;
+    const otherConcepts = bonusPayment + primePayment + commission + conceptS;
     const totalEarned = salaryWorked + totalOvertime + transportationAssistance + otherConcepts;
 
     // Deducciones
@@ -860,13 +862,14 @@ function generateEmployeeJSON() {
     // Otros conceptos
     const transportationAssistance = getNumVal('.transportationAssistance');
     const bonusPayment = getNumVal('.bonusPayment');
+    const primePayment = getNumVal('.primePayment');
     const commission = getNumVal('.commission');
     const conceptS = getNumVal('.conceptS');
     
     // Calcular totales
     const totalOvertimePayment = hedPayment + henPayment + hedfPayment + hrnPayment + hrdfPayment + hendfPayment + hrndfPayment;
     const salaryWorked = getNumVal('.salaryWorked');
-    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + commission + conceptS;
+    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + primePayment + commission + conceptS;
     
     // Deducciones
     const healthDeduction = getNumVal('.healthDeduction');
@@ -1013,7 +1016,7 @@ function generateEmployeeJSON() {
             "bonus": {
                 "amount": "0",
                 "payment": bonusPayment.toFixed(2),
-                "non_salary_payment": "0.00"
+                "non_salary_payment": primePayment.toFixed(2)
             },
             "cesantias": {
                 "payment": "0",
@@ -1051,7 +1054,7 @@ function generateEmployeeJSON() {
             "bonuses": [
                 {
                     "bonusS": bonusPayment.toFixed(2),
-                    "bonusNS": "0.00"
+                    "bonusNS": primePayment.toFixed(2)
                 }
             ],
             "assistances": [
@@ -1716,9 +1719,10 @@ function updatePaymentSummary() {
     
     const transportationAssistance = getNumVal('.transportationAssistance');
     const bonusPayment = getNumVal('.bonusPayment');
+    const primePayment = getNumVal('.primePayment');
     const commission = getNumVal('.commission');
     const conceptS = getNumVal('.conceptS');
-    const otherConcepts = bonusPayment + commission + conceptS;
+    const otherConcepts = bonusPayment + primePayment + commission + conceptS;
     const totalEarned = salaryWorked + totalOvertime + transportationAssistance + otherConcepts;
 
     // Deducciones
@@ -1866,13 +1870,14 @@ function generateEmployeeJSON() {
     // Otros conceptos
     const transportationAssistance = getNumVal('.transportationAssistance');
     const bonusPayment = getNumVal('.bonusPayment');
+    const primePayment = getNumVal('.primePayment');
     const commission = getNumVal('.commission');
     const conceptS = getNumVal('.conceptS');
     
     // Calcular totales
     const totalOvertimePayment = hedPayment + henPayment + hedfPayment + hrnPayment + hrdfPayment + hendfPayment + hrndfPayment;
     const salaryWorked = getNumVal('.salaryWorked');
-    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + commission + conceptS;
+    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + primePayment + commission + conceptS;
     
     // Deducciones
     const healthDeduction = getNumVal('.healthDeduction');
@@ -2019,7 +2024,7 @@ function generateEmployeeJSON() {
             "bonus": {
                 "amount": "0",
                 "payment": bonusPayment.toFixed(2),
-                "non_salary_payment": "0.00"
+                "non_salary_payment": primePayment.toFixed(2)
             },
             "cesantias": {
                 "payment": "0",
@@ -2057,7 +2062,7 @@ function generateEmployeeJSON() {
             "bonuses": [
                 {
                     "bonusS": bonusPayment.toFixed(2),
-                    "bonusNS": "0.00"
+                    "bonusNS": primePayment.toFixed(2)
                 }
             ],
             "assistances": [
@@ -2192,3 +2197,6 @@ document.addEventListener('input', function(e) {
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(updatePaymentSummary, 500);
 });
+
+
+
