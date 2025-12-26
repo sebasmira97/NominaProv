@@ -65,11 +65,20 @@
                     <input type="date" id="dateEntry">
                 </div>
                 <div class="form-group">
-                    <label for="departureDate">
-                        Fecha de Retiro
-                        <span class="info-icon" title="Fecha en que el empleado se retiró de la empresa. Importante! Si el empleado aun esta contratado deja este campo sin llenar.">ℹ️</span>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="isRetirement" style="margin-right: 10px; cursor: pointer; width: auto;">
+                        <span style="font-weight: bold;">Retiro del Empleado</span>
+                        <span class="info-icon" title="Marque esta opción si el empleado se retiró y desea generar la liquidación. Esto habilitará los campos de retiro y agregará la novedad en el JSON.">ℹ️</span>
                     </label>
-                    <input type="date" id="departureDate" placeholder="Dejar vacío si está activo">
+                </div>
+                <div id="retirementFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="departureDate">
+                            Fecha de Retiro
+                            <span class="info-icon" title="Fecha en que el empleado se retiró de la empresa.">ℹ️</span>
+                        </label>
+                        <input type="date" id="departureDate">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="settlementStartDate">Fecha Inicio Liquidación</label>
@@ -326,6 +335,92 @@
                             <div class="form-group">
                                 <label>Otros Conceptos Salariales</label>
                                 <input type="number" class="conceptS" placeholder="0" value="0">
+                            </div>
+                        </div>
+
+                        <h4>Cesantías</h4>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label>
+                                    Cesantías
+                                    <span class="info-icon" title="Pago de cesantías acumuladas.">ℹ️</span>
+                                </label>
+                                <input type="number" class="cesantiasPayment" placeholder="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    Intereses de Cesantías
+                                    <span class="info-icon" title="Intereses sobre cesantías. El porcentaje legal es 1% mensual (12% anual).">ℹ️</span>
+                                </label>
+                                <input type="number" class="cesantiasInterest" placeholder="0" value="0">
+                            </div>
+                        </div>
+
+                        <h4>Vacaciones</h4>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label>
+                                    Tipo de Vacaciones
+                                    <span class="info-icon" title="Seleccione cómo se tomarán las vacaciones: en tiempo de descanso, compensadas en dinero, o una combinación de ambas.">ℹ️</span>
+                                </label>
+                                <select class="vacationType" id="vacationType">
+                                    <option value="none">No aplica</option>
+                                    <option value="time">Vacaciones en Tiempo</option>
+                                    <option value="paid">Vacaciones Compensadas en Dinero</option>
+                                    <option value="both">Ambas (Tiempo + Dinero)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Vacaciones en Tiempo -->
+                        <div id="vacationTimeFields" style="display: none;">
+                            <h5 style="color: #2196F3; margin-top: 10px;">Vacaciones en Tiempo</h5>
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label>Fecha Inicio</label>
+                                    <input type="date" class="vacationTimeStartDate" placeholder="2021-12-31">
+                                </div>
+                                <div class="form-group">
+                                    <label>Fecha Fin</label>
+                                    <input type="date" class="vacationTimeEndDate" placeholder="2021-12-31">
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        Días de Vacaciones
+                                        <span class="info-icon" title="Número de días de vacaciones en tiempo.">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="vacationTimeDays" placeholder="0" value="0" min="0">
+                                </div>
+                            </div>
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label>
+                                        Valor a Pagar
+                                        <span class="info-icon" title="Se calcula automáticamente: Salario Base / 30 × Días">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="vacationTimePayment" placeholder="0" value="0" readonly style="background-color: #f5f5f5;">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Vacaciones Compensadas en Dinero -->
+                        <div id="vacationPaidFields" style="display: none;">
+                            <h5 style="color: #4CAF50; margin-top: 10px;">Vacaciones Compensadas en Dinero</h5>
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label>
+                                        Días de Vacaciones
+                                        <span class="info-icon" title="Número de días de vacaciones compensadas en dinero.">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="vacationPaidDays" placeholder="0" value="0" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        Valor a Pagar
+                                        <span class="info-icon" title="Se calcula automáticamente: Salario Base / 30 × Días">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="vacationPaidPayment" placeholder="0" value="0" readonly style="background-color: #f5f5f5;">
+                                </div>
                             </div>
                         </div>
 

@@ -126,6 +126,984 @@ async function testAPIConnection() {
 window.testAPI = testAPIConnection;
 window.reloadCities = reloadCities;
 
+// ========================================
+// FUNCIONES DE GENERACIÓN DE JSON
+// ========================================
+
+function generateEmployeeJSON(employeeDiv) {
+    const getVal = (selector, defaultVal = '') => {
+        const element = employeeDiv.querySelector(selector);
+        return element ? element.value.trim() : defaultVal;
+    };
+    
+    const getNumVal = (selector, defaultVal = 0) => {
+        const val = parseFloat(getVal(selector));
+        return isNaN(val) ? defaultVal : val;
+    };
+
+    const getCurrentTime = () => {
+        const now = new Date();
+        return now.toTimeString().split(' ')[0];
+    };
+
+    const timeNow = getCurrentTime();
+    
+    const salary = getNumVal('.salary');
+    const workedDays = getNumVal('.workedDays', 30);
+    
+    // Horas extras - OBTENER VALORES REALES DEL FORMULARIO
+    const hedAmount = getNumVal('.hedAmount');
+    const hedPercentage = getNumVal('.hedPercentage', 25);
+    const hedPayment = getNumVal('.hedPayment');
+    
+    const henAmount = getNumVal('.henAmount');
+    const henPercentage = getNumVal('.henPercentage', 75);
+    const henPayment = getNumVal('.henPayment');
+    
+    const hedfAmount = getNumVal('.hedfAmount');
+    const hedfPercentage = getNumVal('.hedfPercentage', 100);
+    const hedfPayment = getNumVal('.hedfPayment');
+    
+    const hrnAmount = getNumVal('.hrnAmount');
+    const hrnPercentage = getNumVal('.hrnPercentage', 35);
+    const hrnPayment = getNumVal('.hrnPayment');
+    
+    const hrdfAmount = getNumVal('.hrdfAmount');
+    const hrdfPercentage = getNumVal('.hrdfPercentage', 75);
+    const hrdfPayment = getNumVal('.hrdfPayment');
+    
+    const hendfAmount = getNumVal('.hendfAmount');
+    const hendfPercentage = getNumVal('.hendfPercentage', 150);
+    const hendfPayment = getNumVal('.hendfPayment');
+    
+    const hrndfAmount = getNumVal('.hrndfAmount');
+    const hrndfPercentage = getNumVal('.hrndfPercentage', 110);
+    const hrndfPayment = getNumVal('.hrndfPayment');
+    
+    // Calcular total horas extras
+    const totalOvertimePayment = hedPayment + henPayment + hedfPayment + hrnPayment + hrdfPayment + hendfPayment + hrndfPayment;
+    
+    // Calcular total devengado
+    const salaryWorked = getNumVal('.salaryWorked');
+    const otherConcepts = bonusPayment + primePayment + commission + conceptS;
+    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + otherConcepts;
+    
+    // Deducciones
+    const healthDeduction = getNumVal('.healthDeduction');
+    const pensionDeduction = getNumVal('.pensionDeduction');
+    const thirdPartyPay = getNumVal('.thirdPartyPay');
+    const otherDeduction = getNumVal('.otherDeduction');
+    
+    const totalDeductions = healthDeduction + pensionDeduction + thirdPartyPay + otherDeduction;
+    const totalVoucher = totalEarned - totalDeductions;
+
+    return {
+        "resolution_number": document.getElementById('resolutionNumber').value || "18760000001",
+        "document_number": document.getElementById('documentNumber').value || "27",
+        "generation_city_id": document.getElementById('generationCityId').value || "1",
+        "worker_code": getVal('.workerCode'),
+        "novelty": false,
+        "pay_day": document.getElementById('payDay').value || new Date().toISOString().split('T')[0],
+        "period": {
+            "date_entry": document.getElementById('dateEntry').value || "",
+            "departure_date": document.getElementById('departureDate').value || null,
+            "settlement_start_date": document.getElementById('settlementStartDate').value || new Date().toISOString().split('T')[0],
+            "settlement_end_date": document.getElementById('settlementEndDate').value || new Date().toISOString().split('T')[0],
+            "time_worked": document.getElementById('timeWorked').value || "30",
+            "generation_date": document.getElementById('generationDate').value || new Date().toISOString().split('T')[0]
+        },
+        "general_information": {
+            "generation_date": document.getElementById('generationDate').value || new Date().toISOString().split('T')[0],
+            "generation_time": timeNow,
+            "period_id": document.getElementById('periodId').value || "5",
+            "currency_id": "272",
+            "trm": "0"
+        },
+        "notes": "",
+        "employee": {
+            "worker_type_id": parseInt(getVal('.workerTypeId', '1')),
+            "worker_subtype_id": parseInt(getVal('.workerSubtypeId', '1')),
+            "high_risk_pension": getVal('.highRiskPension', 'false'),
+            "identity_document_id": getVal('.identityDocumentId', '1'),
+            "document_number": getVal('.documentNumber'),
+            "first_surname": getVal('.firstSurname'),           // ← Primer apellido (obligatorio)
+            "second_surname": getVal('.secondSurname'),         // ← Segundo apellido (opcional)
+            "first_name": getVal('.firstName'),                 // ← Primer nombre (obligatorio)
+            "other_names": getVal('.otherNames'),               // ← Segundo nombre (opcional)
+            "working_country_id": getNumVal('.workingCountryId', 45),
+            "work_city_id": getNumVal('.workCityId'),
+            "work_address": getVal('.workAddress'),
+            "integral_salary": getVal('.integralSalary', 'false'),
+            "contract_type_id": parseInt(getVal('.contractTypeId', '1')),
+            "salary": salary.toString(),
+            "worker_code": getVal('.workerCode')
+        },
+        "payment": {
+            "payment_method_id": getVal('.paymentMethodId', '1'),
+            "means_payment_id": getVal('.meansPaymentId', '31'),
+            "bank": getVal('.bank'),
+            "account_type": getVal('.accountType'),
+            "account_number": getVal('.accountNumber')
+        },
+        "earn": {
+            "basic": {
+                "worked_days": workedDays.toString(),
+                "salary_worked": getNumVal('.salaryWorked', salary).toString()
+            },
+            "transport": {
+                "transportation_assistance": transportationAssistance.toString(),
+                "viatic_maintenance": getNumVal('.viaticMaintenance').toString(),
+                "viatic_non_salary_maintenance": getNumVal('.viaticNonSalary').toString()
+            },
+            "HEDs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hedAmount.toString(),
+                    "percentage": hedPercentage.toFixed(2),
+                    "payment": hedPayment.toFixed(2)
+                }
+            ],
+            "HENs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": henAmount.toString(),
+                    "percentage": henPercentage.toFixed(2),
+                    "payment": henPayment.toFixed(2)
+                }
+            ],
+            "HRNs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hrnAmount.toString(),
+                    "percentage": hrnPercentage.toFixed(2),
+                    "payment": hrnPayment.toFixed(2)
+                }
+            ],
+            "HEDDFs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hedfAmount.toString(),
+                    "percentage": hedfPercentage.toFixed(2),
+                    "payment": hedfPayment.toFixed(2)
+                }
+            ],
+            "HRDDFs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hrdfAmount.toString(),
+                    "percentage": hrdfPercentage.toFixed(2),
+                    "payment": hrdfPayment.toFixed(2)
+                }
+            ],
+            "HENDFs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hendfAmount.toString(),
+                    "percentage": hendfPercentage.toFixed(2),
+                    "payment": hendfPayment.toFixed(2)
+                }
+            ],
+            "HRNDFs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hrndfAmount.toString(),
+                    "percentage": hrndfPercentage.toFixed(2),
+                    "payment": hrndfPayment.toFixed(2)
+                }
+            ],
+            "vacations": {
+                "common": {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0",
+                    "payment": "0.00"
+                },
+                "paid": {
+                    "amount": "0",
+                    "payment": "0.00"
+                }
+            },
+            "bonus": {
+                "amount": "0",
+                "payment": bonusPayment.toFixed(2),
+                "non_salary_payment": primePayment.toFixed(2)
+            },
+            "cesantias": {
+                "payment": "0",
+                "percentage": "0.00",
+                "interest_payment": "0.00"
+            },
+            "incapacity": [
+                {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0",
+                    "type_id": 1,
+                    "payment": "0.00"
+                }
+            ],
+            "licenses": {
+                "licenseMP": {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0",
+                    "payment": "0.00"
+                },
+                "licenseR": {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0",
+                    "payment": "0.00"
+                },
+                "licenseNR": {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0"
+                }
+            },
+            "bonuses": [
+                {
+                    "bonusS": bonusPayment.toFixed(2),
+                    "bonusNS": primePayment.toFixed(2)
+                }
+            ],
+            "assistances": [
+                {
+                    "assistanceS": "0.00",
+                    "assistanceNS": "0.00"
+                }
+            ],
+            "legal_strikes": [
+                {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0"
+                }
+            ],
+            "other_concepts": [
+                {
+                    "description": "Otros conceptos",
+                    "conceptS": conceptS.toFixed(2),
+                    "conceptNS": "0.00"
+                }
+            ],
+            "compensations": [
+                {
+                    "compensationO": "0.00",
+                    "compensationE": "0.00"
+                }
+            ],
+            "bondEPCTVs": [
+                {
+                    "paymentS": "0.00",
+                    "paymentNS": "0.00",
+                    "payment_foodS": "0.00",
+                    "payment_foodNS": "0.00"
+                }
+            ],
+            "commissions": [
+                {
+                    "commission": commission.toFixed(2)
+                }
+            ],
+            "payments_third_party": [
+                {
+                    "payment_third_party": "0.00"
+                }
+            ],
+            "advances": [
+                {
+                    "advance": "0.00"
+                }
+            ],
+            "endowment": "0.00",
+            "sustaining_support": "0.00",
+            "teleworking": "0.00",
+            "withdrawal_bonus": "0.00",
+            "indemnification": "0.00",
+            "refund": "0.00"
+        },
+        "deductions": {
+            "health": {
+                "percentage": getNumVal('.healthPercentage', 4).toString(),
+                "deduction": healthDeduction.toString()
+            },
+            "pension_fund": {
+                "percentage": getNumVal('.pensionPercentage', 4).toString(),
+                "deduction": pensionDeduction.toString()
+            },
+            "fundSP": {
+                "percentage": "0.00",
+                "deduction": "0.00",
+                "percentageSub": "0.00",
+                "deductionSub": "0.00"
+            },
+            "trade_union": [
+                {
+                    "percentage": "0.00",
+                    "deduction": "0.00"
+                }
+            ],
+            "sanctions": [
+                {
+                    "sanctionPublic": "0.00",
+                    "sanctionPriv": "0.00"
+                }
+            ],
+            "libranzas": [
+                {
+                    "description": "",
+                    "deduction": "0.00"
+                }
+            ],
+            "third_party_payment": [
+                {
+                    "third_party_pay": thirdPartyPay.toFixed(2)
+                }
+            ],
+            "advances": [
+                {
+                    "advance": "0.00"
+                }
+            ],
+            "other_deductions": [
+                {
+                    "other_deduction": otherDeduction.toFixed(2)
+                }
+            ],
+            "voluntary_pension": "0.00",
+            "retefuente": "0.00",
+            "afc": "0.00",
+            "cooperative": "0.00",
+            "tax_embargo": "0.00",
+            "complementary_plan": "0.00",
+            "education": "0.00",
+            "refund": "0.00",
+            "debt": "0.00"
+        },
+        "rounding": Math.round(totalVoucher % 100).toString(),
+        "total_earned": totalEarned.toString(),
+        "deductions_total": totalDeductions.toString(),
+        "total_voucher": totalVoucher.toString()
+    };
+}
+
+function updatePreview() {
+    const employees = document.querySelectorAll('.employee-section');
+    if (employees.length === 0) {
+        document.getElementById('jsonPreview').textContent = 'Agregue al menos un empleado para ver la vista previa...';
+        return;
+    }
+    
+    const allEmployeesJSON = [];
+    employees.forEach(emp => {
+        allEmployeesJSON.push(generateEmployeeJSON(emp));
+    });
+    
+    const preview = allEmployeesJSON.length === 1 ? 
+        allEmployeesJSON[0] : 
+        { "employees": allEmployeesJSON };
+        
+    document.getElementById('jsonPreview').textContent = JSON.stringify(preview, null, 2);
+}
+
+function generateJSON() {
+    const validation = validateRequiredFields();
+    
+    if (!validation.isValid) {
+        alert(`Por favor complete los siguientes campos obligatorios:\n• ${validation.errors.join('\n• ')}`);
+        return;
+    }
+
+    const employees = document.querySelectorAll('.employee-section');
+    if (employees.length === 0) {
+        alert('❌ Por favor agregue al empleado antes de generar el JSON');
+        return;
+    }
+    
+    const allEmployeesJSON = [];
+    employees.forEach(emp => {
+        allEmployeesJSON.push(generateEmployeeJSON(emp));
+    });
+    
+    let finalJSON;
+    let filename;
+    
+    if (allEmployeesJSON.length === 1) {
+        finalJSON = allEmployeesJSON[0];
+        const employeeName = finalJSON.employee.first_name + '_' + finalJSON.employee.first_surname;
+        filename = `nomina_${employeeName}_${finalJSON.period.settlement_end_date}.json`;
+    } else {
+        finalJSON = { "employees": allEmployeesJSON };
+        filename = `nomina_multiple_${new Date().toISOString().split('T')[0]}.json`;
+    }
+    
+    // Crear y descargar archivo
+    const blob = new Blob([JSON.stringify(finalJSON, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    // También generar archivo TXT
+    const txtBlob = new Blob([JSON.stringify(finalJSON, null, 2)], { type: 'text/plain' });
+    const txtUrl = URL.createObjectURL(txtBlob);
+    const txtA = document.createElement('a');
+    txtA.href = txtUrl;
+    txtA.download = filename.replace('.json', '.txt');
+    txtA.click();
+    URL.revokeObjectURL(txtUrl);
+    
+    alert(`✅ Archivos generados exitosamente:\n\n📄 ${filename}\n📄 ${filename.replace('.json', '.txt')}\n\nLos archivos están listos para transmisión de nómina electrónica.`);
+}
+
+// Función para actualizar el resumen de pagos
+function updatePaymentSummary() {
+    const employeeDiv = document.querySelector('.employee-section');
+    if (!employeeDiv) return;
+
+    const getNumVal = (selector) => {
+        const element = employeeDiv.querySelector(selector);
+        return parseFloat(element?.value) || 0;
+    };
+
+    // Devengados
+    const salaryWorked = getNumVal('.salaryWorked');
+    
+    // Todas las horas extras
+    const hedPayment = getNumVal('.hedPayment');
+    const henPayment = getNumVal('.henPayment');
+    const hedfPayment = getNumVal('.hedfPayment');
+    const hrnPayment = getNumVal('.hrnPayment');
+    const hrdfPayment = getNumVal('.hrdfPayment');
+    const hendfPayment = getNumVal('.hendfPayment');
+    const hrndfPayment = getNumVal('.hrndfPayment');
+    
+    const totalOvertime = hedPayment + henPayment + hedfPayment + hrnPayment + hrdfPayment + hendfPayment + hrndfPayment;
+    
+    const transportationAssistance = getNumVal('.transportationAssistance');
+    const bonusPayment = getNumVal('.bonusPayment');
+    const primePayment = getNumVal('.primePayment');
+    const commission = getNumVal('.commission');
+    const conceptS = getNumVal('.conceptS');
+    const otherConcepts = bonusPayment + primePayment + commission + conceptS;
+    const totalEarned = salaryWorked + totalOvertime + transportationAssistance + otherConcepts;
+
+    // Deducciones
+    const healthDeduction = getNumVal('.healthDeduction');
+    const pensionDeduction = getNumVal('.pensionDeduction');
+    const thirdPartyPay = getNumVal('.thirdPartyPay');
+    const otherDeduction = getNumVal('.otherDeduction');
+    const otherDeductions = thirdPartyPay + otherDeduction;
+    const totalDeductions = healthDeduction + pensionDeduction + otherDeductions;
+
+    // Neto a pagar
+    const netPay = totalEarned - totalDeductions;
+
+    // Actualizar resumen
+    const formatCurrency = (value) => new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0
+    }).format(value);
+
+    // Actualizar elementos si existen
+    const summaryElements = {
+        '.summary-salaryWorked': salaryWorked,
+        '.summary-overtime': totalOvertime,
+        '.summary-transport': transportationAssistance,
+        '.summary-others': otherConcepts,
+        '.summary-totalEarned': totalEarned,
+        '.summary-health': healthDeduction,
+        '.summary-pension': pensionDeduction,
+        '.summary-otherDeductions': otherDeductions,
+        '.summary-totalDeductions': totalDeductions,
+        '.summary-netPay': netPay
+    };
+
+    Object.entries(summaryElements).forEach(([selector, value]) => {
+        const element = document.querySelector(selector);
+        if (element) {
+            element.textContent = formatCurrency(value);
+        }
+    });
+}
+
+// Función para validar campos obligatorios
+function validateRequiredFields() {
+    const meansPaymentSelect = document.querySelector('.meansPaymentId');
+    const isEffectivo = meansPaymentSelect?.value === '10';
+    
+    let requiredSelectors = [
+        '.documentNumber',
+        '.firstName', 
+        '.firstSurname',
+        '.salary',
+        '.workerCode',
+        '.workAddress'
+    ];
+    
+    if (!isEffectivo) {
+        requiredSelectors.push('.bank', '.accountNumber');
+    }
+
+    let isValid = true;
+    const errors = [];
+
+    requiredSelectors.forEach(selector => {
+        const field = document.querySelector(selector);
+        const formGroup = field?.closest('.form-group');
+        
+        if (field && formGroup) {
+            formGroup.classList.remove('has-error');
+            const existingError = formGroup.querySelector('.error-message');
+            if (existingError) existingError.remove();
+
+            if (!field.readOnly && !field.value.trim()) {
+                isValid = false;
+                const fieldName = field.closest('.form-group').querySelector('label').textContent.replace('*', '').trim();
+                errors.push(fieldName);
+                
+                formGroup.classList.add('has-error');
+                const errorMsg = document.createElement('span');
+                errorMsg.className = 'error-message';
+                errorMsg.textContent = 'Este campo es obligatorio';
+                field.parentNode.appendChild(errorMsg);
+            }
+        }
+    });
+
+    return { isValid, errors };
+}
+
+// Función principal para generar el JSON del empleado
+function generateEmployeeJSON() {
+    const employeeDiv = document.querySelector('.employee-section');
+    if (!employeeDiv) return null;
+
+    const getVal = (selector, defaultVal = '') => {
+        const element = employeeDiv.querySelector(selector);
+        return element ? element.value.trim() : defaultVal;
+    };
+    
+    const getNumVal = (selector, defaultVal = 0) => {
+        const val = parseFloat(getVal(selector));
+        return isNaN(val) ? defaultVal : val;
+    };
+
+    const getCurrentTime = () => {
+        const now = new Date();
+        return now.toTimeString().split(' ')[0];
+    };
+
+    const timeNow = getCurrentTime();
+    
+    // Datos básicos
+    const salary = getNumVal('.salary');
+    const workedDays = getNumVal('.workedDays', 30);
+    
+    // Todas las horas extras
+    const hedAmount = getNumVal('.hedAmount');
+    const hedPercentage = getNumVal('.hedPercentage', 25);
+    const hedPayment = getNumVal('.hedPayment');
+    
+    const henAmount = getNumVal('.henAmount');
+    const henPercentage = getNumVal('.henPercentage', 75);
+    const henPayment = getNumVal('.henPayment');
+    
+    const hedfAmount = getNumVal('.hedfAmount');
+    const hedfPercentage = getNumVal('.hedfPercentage', 100);
+    const hedfPayment = getNumVal('.hedfPayment');
+    
+    const hrnAmount = getNumVal('.hrnAmount');
+    const hrnPercentage = getNumVal('.hrnPercentage', 35);
+    const hrnPayment = getNumVal('.hrnPayment');
+    
+    const hrdfAmount = getNumVal('.hrdfAmount');
+    const hrdfPercentage = getNumVal('.hrdfPercentage', 75);
+    const hrdfPayment = getNumVal('.hrdfPayment');
+    
+    const hendfAmount = getNumVal('.hendfAmount');
+    const hendfPercentage = getNumVal('.hendfPercentage', 150);
+    const hendfPayment = getNumVal('.hendfPayment');
+    
+    const hrndfAmount = getNumVal('.hrndfAmount');
+    const hrndfPercentage = getNumVal('.hrndfPercentage', 110);
+    const hrndfPayment = getNumVal('.hrndfPayment');
+    
+    // Otros conceptos
+    const transportationAssistance = getNumVal('.transportationAssistance');
+    const bonusPayment = getNumVal('.bonusPayment');
+    const primePayment = getNumVal('.primePayment');
+    const commission = getNumVal('.commission');
+    const conceptS = getNumVal('.conceptS');
+    
+    // Calcular totales
+    const totalOvertimePayment = hedPayment + henPayment + hedfPayment + hrnPayment + hrdfPayment + hendfPayment + hrndfPayment;
+    const salaryWorked = getNumVal('.salaryWorked');
+    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + primePayment + commission + conceptS;
+    
+    // Deducciones
+    const healthDeduction = getNumVal('.healthDeduction');
+    const pensionDeduction = getNumVal('.pensionDeduction');
+    const thirdPartyPay = getNumVal('.thirdPartyPay');
+    const otherDeduction = getNumVal('.otherDeduction');
+    
+    const totalDeductions = healthDeduction + pensionDeduction + thirdPartyPay + otherDeduction;
+    const totalVoucher = totalEarned - totalDeductions;
+
+    return {
+        "resolution_number": document.getElementById('resolutionNumber')?.value || "18760000001",
+        "document_number": document.getElementById('documentNumber')?.value || "27",
+        "generation_city_id": document.getElementById('generationCityId')?.value || "1",
+        "worker_code": getVal('.workerCode'),
+        "novelty": false,
+        "pay_day": document.getElementById('payDay')?.value || new Date().toISOString().split('T')[0],
+        "period": {
+            "date_entry": document.getElementById('dateEntry')?.value || "",
+            "departure_date": document.getElementById('departureDate')?.value || null,
+            "settlement_start_date": document.getElementById('settlementStartDate')?.value || new Date().toISOString().split('T')[0],
+            "settlement_end_date": document.getElementById('settlementEndDate')?.value || new Date().toISOString().split('T')[0],
+            "time_worked": document.getElementById('timeWorked')?.value || "30",
+            "generation_date": document.getElementById('generationDate')?.value || new Date().toISOString().split('T')[0]
+        },
+        "general_information": {
+            "generation_date": document.getElementById('generationDate')?.value || new Date().toISOString().split('T')[0],
+            "generation_time": timeNow,
+            "period_id": document.getElementById('periodId')?.value || "5",
+            "currency_id": "272",
+            "trm": "0"
+        },
+        "notes": "",
+        "employee": {
+            "worker_type_id": parseInt(getVal('.workerTypeId', '1')),
+            "worker_subtype_id": parseInt(getVal('.workerSubtypeId', '1')),
+            "high_risk_pension": getVal('.highRiskPension', 'false'),
+            "identity_document_id": getVal('.identityDocumentId', '1'),
+            "document_number": getVal('.documentNumber'),
+            "first_surname": getVal('.firstSurname'),
+            "second_surname": getVal('.secondSurname'),
+            "first_name": getVal('.firstName'),
+            "other_names": getVal('.otherNames'),
+            "working_country_id": getNumVal('.workingCountryId', 45),
+            "work_city_id": getNumVal('.workCityId'),
+            "work_address": getVal('.workAddress'),
+            "integral_salary": getVal('.integralSalary', 'false'),
+            "contract_type_id": parseInt(getVal('.contractTypeId', '1')),
+            "salary": salary.toString(),
+            "worker_code": getVal('.workerCode')
+        },
+        "payment": {
+            "payment_method_id": getVal('.paymentMethodId', '1'),
+            "means_payment_id": getVal('.meansPaymentId', '31'),
+            "bank": getVal('.bank'),
+            "account_type": getVal('.accountType'),
+            "account_number": getVal('.accountNumber')
+        },
+        "earn": {
+            "basic": {
+                "worked_days": workedDays.toString(),
+                "salary_worked": salaryWorked.toString()
+            },
+            "transport": {
+                "transportation_assistance": transportationAssistance.toString(),
+                "viatic_maintenance": getNumVal('.viaticMaintenance').toString(),
+                "viatic_non_salary_maintenance": getNumVal('.viaticNonSalary').toString()
+            },
+            "HEDs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hedAmount.toString(),
+                    "percentage": hedPercentage.toFixed(2),
+                    "payment": hedPayment.toFixed(2)
+                }
+            ],
+            "HENs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": henAmount.toString(),
+                    "percentage": henPercentage.toFixed(2),
+                    "payment": henPayment.toFixed(2)
+                }
+            ],
+            "HRNs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hrnAmount.toString(),
+                    "percentage": hrnPercentage.toFixed(2),
+                    "payment": hrnPayment.toFixed(2)
+                }
+            ],
+            "HEDDFs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hedfAmount.toString(),
+                    "percentage": hedfPercentage.toFixed(2),
+                    "payment": hedfPayment.toFixed(2)
+                }
+            ],
+            "HRDDFs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hrdfAmount.toString(),
+                    "percentage": hrdfPercentage.toFixed(2),
+                    "payment": hrdfPayment.toFixed(2)
+                }
+            ],
+            "HENDFs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hendfAmount.toString(),
+                    "percentage": hendfPercentage.toFixed(2),
+                    "payment": hendfPayment.toFixed(2)
+                }
+            ],
+            "HRNDFs": [
+                {
+                    "start_time": "2021-12-31T00:00:00",
+                    "final_hour": "2021-12-31T00:00:00",
+                    "amount": hrndfAmount.toString(),
+                    "percentage": hrndfPercentage.toFixed(2),
+                    "payment": hrndfPayment.toFixed(2)
+                }
+            ],
+            "vacations": {
+                "common": {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0",
+                    "payment": "0.00"
+                },
+                "paid": {
+                    "amount": "0",
+                    "payment": "0.00"
+                }
+            },
+            "bonus": {
+                "amount": "0",
+                "payment": bonusPayment.toFixed(2),
+                "non_salary_payment": primePayment.toFixed(2)
+            },
+            "cesantias": {
+                "payment": "0",
+                "percentage": "0.00",
+                "interest_payment": "0.00"
+            },
+            "incapacity": [
+                {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0",
+                    "type_id": 1,
+                    "payment": "0.00"
+                }
+            ],
+            "licenses": {
+                "licenseMP": {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0",
+                    "payment": "0.00"
+                },
+                "licenseR": {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0",
+                    "payment": "0.00"
+                },
+                "licenseNR": {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0"
+                }
+            },
+            "bonuses": [
+                {
+                    "bonusS": bonusPayment.toFixed(2),
+                    "bonusNS": primePayment.toFixed(2)
+                }
+            ],
+            "assistances": [
+                {
+                    "assistanceS": "0.00",
+                    "assistanceNS": "0.00"
+                }
+            ],
+            "legal_strikes": [
+                {
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0"
+                }
+            ],
+            "other_concepts": [
+                {
+                    "description": "Otros conceptos",
+                    "conceptS": conceptS.toFixed(2),
+                    "conceptNS": "0.00"
+                }
+            ],
+            "compensations": [
+                {
+                    "compensationO": "0.00",
+                    "compensationE": "0.00"
+                }
+            ],
+            "bondEPCTVs": [
+                {
+                    "paymentS": "0.00",
+                    "paymentNS": "0.00",
+                    "payment_foodS": "0.00",
+                    "payment_foodNS": "0.00"
+                }
+            ],
+            "commissions": [
+                {
+                    "commission": commission.toFixed(2)
+                }
+            ],
+            "payments_third_party": [
+                {
+                    "payment_third_party": "0.00"
+                }
+            ],
+            "advances": [
+                {
+                    "advance": "0.00"
+                }
+            ],
+            "endowment": "0.00",
+            "sustaining_support": "0.00",
+            "teleworking": "0.00",
+            "withdrawal_bonus": "0.00",
+            "indemnification": "0.00",
+            "refund": "0.00"
+        },
+        "deductions": {
+            "health": {
+                "percentage": getNumVal('.healthPercentage', 4).toString(),
+                "deduction": healthDeduction.toString()
+            },
+            "pension_fund": {
+                "percentage": getNumVal('.pensionPercentage', 4).toString(),
+                "deduction": pensionDeduction.toString()
+            },
+            "fundSP": {
+                "percentage": "0.00",
+                "deduction": "0.00",
+                "percentageSub": "0.00",
+                "deductionSub": "0.00"
+            },
+            "trade_union": [
+                {
+                    "percentage": "0.00",
+                    "deduction": "0.00"
+                }
+            ],
+            "sanctions": [
+                {
+                    "sanctionPublic": "0.00",
+                    "sanctionPriv": "0.00"
+                }
+            ],
+            "libranzas": [
+                {
+                    "description": "",
+                    "deduction": "0.00"
+                }
+            ],
+            "third_party_payment": [
+                {
+                    "third_party_pay": thirdPartyPay.toFixed(2)
+                }
+            ],
+            "advances": [
+                {
+                    "advance": "0.00"
+                }
+            ],
+            "other_deductions": [
+                {
+                    "other_deduction": otherDeduction.toFixed(2)
+                }
+            ],
+            "voluntary_pension": "0.00",
+            "retefuente": "0.00",
+            "afc": "0.00",
+            "cooperative": "0.00",
+            "tax_embargo": "0.00",
+            "complementary_plan": "0.00",
+            "education": "0.00",
+            "refund": "0.00",
+            "debt": "0.00"
+        },
+        "rounding": Math.round(totalVoucher % 100).toString(),
+        "total_earned": totalEarned.toString(),
+        "deductions_total": totalDeductions.toString(),
+        "total_voucher": totalVoucher.toString()
+    };
+}
+
+// Función para actualizar la vista previa
+function updatePreview() {
+    const jsonData = generateEmployeeJSON();
+    const previewElement = document.getElementById('jsonPreview');
+    
+    if (jsonData && previewElement) {
+        previewElement.textContent = JSON.stringify(jsonData, null, 2);
+    } else if (previewElement) {
+        previewElement.textContent = 'Error: No se pudo generar el JSON. Verifique que todos los campos estén completos.';
+    }
+}
+
+// Función para generar y descargar JSON
+function generateJSON() {
+    const validation = validateRequiredFields();
+    
+    if (!validation.isValid) {
+        alert(`Por favor complete los siguientes campos obligatorios:\n• ${validation.errors.join('\n• ')}`);
+        return;
+    }
+
+    const jsonData = generateEmployeeJSON();
+    
+    if (!jsonData) {
+        alert('Error al generar el JSON. Verifique los datos ingresados.');
+        return;
+    }
+
+    // Crear archivo y descargarlo
+    const jsonString = JSON.stringify(jsonData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `nomina_${jsonData.employee.document_number}_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('✅ Archivo JSON descargado exitosamente!');
+}
+
+// Funciones para recargar ciudades (si existen en el contexto de API)
 function reloadCities() {
     if (typeof convertCityInputToSelect === 'function') {
         convertCityInputToSelect(API_CONFIG?.CITIES_URL || 'https://api-v2.matias-api.com/api/ubl2.1/cities');
@@ -181,16 +1159,6 @@ function setupCalculations(employeeDiv) {
     const hrndfAmountInput = employeeDiv.querySelector('.hrndfAmount');
     const hrndfPercentageInput = employeeDiv.querySelector('.hrndfPercentage');
     const hrndfPaymentInput = employeeDiv.querySelector('.hrndfPayment');
-    
-    // Campos de cesantías
-    const cesantiasPaymentInput = employeeDiv.querySelector('.cesantiasPayment');
-    const cesantiasInterestInput = employeeDiv.querySelector('.cesantiasInterest');
-    
-    // Campos de vacaciones
-    const vacationTimeDaysInput = employeeDiv.querySelector('.vacationTimeDays');
-    const vacationTimePaymentInput = employeeDiv.querySelector('.vacationTimePayment');
-    const vacationPaidDaysInput = employeeDiv.querySelector('.vacationPaidDays');
-    const vacationPaidPaymentInput = employeeDiv.querySelector('.vacationPaidPayment');
 
     function calculateAll() {
         const salary = parseFloat(salaryInput?.value) || 0;
@@ -239,19 +1207,6 @@ function setupCalculations(employeeDiv) {
         if (healthDeductionInput) healthDeductionInput.value = healthDeduction;
         if (pensionDeductionInput) pensionDeductionInput.value = pensionDeduction;
         
-        // Calcular vacaciones (salario base diario = salario / 30)
-        const salarioDiario = salary > 0 ? salary / 30 : 0;
-        
-        // Vacaciones en tiempo
-        const vacationTimeDays = parseFloat(vacationTimeDaysInput?.value) || 0;
-        const vacationTimePayment = vacationTimeDays > 0 ? Math.round(salarioDiario * vacationTimeDays) : 0;
-        if (vacationTimePaymentInput) vacationTimePaymentInput.value = vacationTimePayment;
-        
-        // Vacaciones compensadas en dinero
-        const vacationPaidDays = parseFloat(vacationPaidDaysInput?.value) || 0;
-        const vacationPaidPayment = vacationPaidDays > 0 ? Math.round(salarioDiario * vacationPaidDays) : 0;
-        if (vacationPaidPaymentInput) vacationPaidPaymentInput.value = vacationPaidPayment;
-        
         // Actualizar resumen después de calcular
         setTimeout(updatePaymentSummary, 100);
     }
@@ -262,8 +1217,7 @@ function setupCalculations(employeeDiv) {
         hedAmountInput, hedPercentageInput, henAmountInput, henPercentageInput,
         hedfAmountInput, hedfPercentageInput, hrnAmountInput, hrnPercentageInput,
         hrdfAmountInput, hrdfPercentageInput, hendfAmountInput, hendfPercentageInput,
-        hrndfAmountInput, hrndfPercentageInput, cesantiasPaymentInput, cesantiasInterestInput,
-        vacationTimeDaysInput, vacationPaidDaysInput
+        hrndfAmountInput, hrndfPercentageInput
     ];
 
     allInputs.forEach(input => {
@@ -649,10 +1603,7 @@ function updatePaymentSummary() {
     const primePayment = getNumVal('.primePayment');
     const commission = getNumVal('.commission');
     const conceptS = getNumVal('.conceptS');
-    const cesantiasPayment = getNumVal('.cesantiasPayment');
-    const cesantiasInterest = getNumVal('.cesantiasInterest');
-    const vacationPaidPayment = getNumVal('.vacationPaidPayment');
-    const otherConcepts = bonusPayment + primePayment + commission + conceptS + cesantiasPayment + cesantiasInterest + vacationPaidPayment;
+    const otherConcepts = bonusPayment + primePayment + commission + conceptS;
     const totalEarned = salaryWorked + totalOvertime + transportationAssistance + otherConcepts;
 
     // Deducciones
@@ -803,24 +1754,11 @@ function generateEmployeeJSON() {
     const primePayment = getNumVal('.primePayment');
     const commission = getNumVal('.commission');
     const conceptS = getNumVal('.conceptS');
-    const cesantiasPayment = getNumVal('.cesantiasPayment');
-    const cesantiasInterest = getNumVal('.cesantiasInterest');
-    
-    // Vacaciones
-    const vacationTimeDays = getNumVal('.vacationTimeDays');
-    const vacationTimePayment = getNumVal('.vacationTimePayment');
-    const vacationPaidDays = getNumVal('.vacationPaidDays');
-    const vacationPaidPayment = getNumVal('.vacationPaidPayment');
-    const vacationTimeStartDate = getVal('.vacationTimeStartDate', '2021-12-31');
-    const vacationTimeEndDate = getVal('.vacationTimeEndDate', '2021-12-31');
-    
-    // Porcentaje legal de cesantías en Colombia: 8.33% (equivalente a 1 mes de salario por año / 12 meses)
-    const cesantiasPercentage = cesantiasPayment > 0 ? "12.00" : "0.00";
     
     // Calcular totales
     const totalOvertimePayment = hedPayment + henPayment + hedfPayment + hrnPayment + hrdfPayment + hendfPayment + hrndfPayment;
     const salaryWorked = getNumVal('.salaryWorked');
-    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + primePayment + commission + conceptS + cesantiasPayment + cesantiasInterest + vacationPaidPayment;
+    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + primePayment + commission + conceptS;
     
     // Deducciones
     const healthDeduction = getNumVal('.healthDeduction');
@@ -830,16 +1768,13 @@ function generateEmployeeJSON() {
     
     const totalDeductions = healthDeduction + pensionDeduction + thirdPartyPay + otherDeduction;
     const totalVoucher = totalEarned - totalDeductions;
-    
-    // Verificar si es retiro/liquidación
-    const isRetirement = document.getElementById('isRetirement')?.checked || false;
 
     return {
         "resolution_number": document.getElementById('resolutionNumber')?.value || "18760000001",
         "document_number": document.getElementById('documentNumber')?.value || "27",
         "generation_city_id": document.getElementById('generationCityId')?.value || "1",
         "worker_code": getVal('.workerCode'),
-        "novelty": isRetirement,
+        "novelty": false,
         "pay_day": document.getElementById('payDay')?.value || new Date().toISOString().split('T')[0],
         "period": {
             "date_entry": document.getElementById('dateEntry')?.value || "",
@@ -957,14 +1892,14 @@ function generateEmployeeJSON() {
             ],
             "vacations": {
                 "common": {
-                    "start_date": vacationTimeStartDate,
-                    "final_date": vacationTimeEndDate,
-                    "amount": vacationTimeDays.toString(),
-                    "payment": vacationTimePayment.toFixed(2)
+                    "start_date": "2021-12-31",
+                    "final_date": "2021-12-31",
+                    "amount": "0",
+                    "payment": "0.00"
                 },
                 "paid": {
-                    "amount": vacationPaidDays.toString(),
-                    "payment": vacationPaidPayment.toFixed(2)
+                    "amount": "0",
+                    "payment": "0.00"
                 }
             },
             "bonus": {
@@ -973,9 +1908,9 @@ function generateEmployeeJSON() {
                 "non_salary_payment": primePayment.toFixed(2)
             },
             "cesantias": {
-                "payment": cesantiasPayment.toFixed(2),
-                "percentage": cesantiasPercentage,
-                "interest_payment": cesantiasInterest.toFixed(2)
+                "payment": "0",
+                "percentage": "0.00",
+                "interest_payment": "0.00"
             },
             "incapacity": [
                 {
@@ -1132,65 +2067,6 @@ function generateEmployeeJSON() {
     };
 }
 
-// Función para actualizar la vista previa del JSON
-function updatePreview() {
-    const jsonData = generateEmployeeJSON();
-    const previewElement = document.getElementById('jsonPreview');
-    
-    if (jsonData && previewElement) {
-        previewElement.textContent = JSON.stringify(jsonData, null, 2);
-    } else if (previewElement) {
-        previewElement.textContent = 'Complete los datos del empleado para ver la vista previa...';
-    }
-}
-
-// Función para generar y descargar el archivo JSON
-function generateJSON() {
-    const validation = validateRequiredFields();
-    
-    if (!validation.isValid) {
-        alert(`Por favor complete los siguientes campos obligatorios:\n• ${validation.errors.join('\n• ')}`);
-        return;
-    }
-
-    const jsonData = generateEmployeeJSON();
-    
-    if (!jsonData) {
-        alert('❌ Error al generar el JSON. Verifique los datos ingresados.');
-        return;
-    }
-
-    // Crear nombre de archivo
-    const employeeName = jsonData.employee.first_name + '_' + jsonData.employee.first_surname;
-    const filename = `nomina_${employeeName}_${jsonData.period.settlement_end_date}.json`;
-    
-    // Crear y descargar archivo JSON
-    const jsonString = JSON.stringify(jsonData, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    // También generar archivo TXT
-    const txtBlob = new Blob([jsonString], { type: 'text/plain' });
-    const txtUrl = URL.createObjectURL(txtBlob);
-    const txtA = document.createElement('a');
-    txtA.href = txtUrl;
-    txtA.download = filename.replace('.json', '.txt');
-    document.body.appendChild(txtA);
-    txtA.click();
-    document.body.removeChild(txtA);
-    URL.revokeObjectURL(txtUrl);
-    
-    alert(`✅ Archivos generados exitosamente:\n\n📄 ${filename}\n📄 ${filename.replace('.json', '.txt')}\n\nLos archivos están listos para transmisión de nómina electrónica.`);
-}
-
 // Función para actualizar resumen
 document.addEventListener('input', function(e) {
     if (e.target.matches('input[type="number"], input[type="text"]')) {
@@ -1201,64 +2077,7 @@ document.addEventListener('input', function(e) {
 // Inicializar resumen al cargar
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(updatePaymentSummary, 500);
-    
-    // Listener para mostrar/ocultar campos de retiro
-    const isRetirementCheckbox = document.getElementById('isRetirement');
-    const retirementFields = document.getElementById('retirementFields');
-    if (isRetirementCheckbox && retirementFields) {
-        isRetirementCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                retirementFields.style.display = 'block';
-            } else {
-                retirementFields.style.display = 'none';
-                // Limpiar los campos cuando se desmarca
-                document.getElementById('departureDate').value = '';
-            }
-        });
-    }
-    
-    // Listener para mostrar/ocultar campos de vacaciones según el tipo seleccionado
-    const vacationTypeSelect = document.getElementById('vacationType');
-    const vacationTimeFields = document.getElementById('vacationTimeFields');
-    const vacationPaidFields = document.getElementById('vacationPaidFields');
-    
-    if (vacationTypeSelect && vacationTimeFields && vacationPaidFields) {
-        vacationTypeSelect.addEventListener('change', function() {
-            const selectedType = this.value;
-            
-            // Ocultar todos los campos primero
-            vacationTimeFields.style.display = 'none';
-            vacationPaidFields.style.display = 'none';
-            
-            // Mostrar campos según selección
-            if (selectedType === 'time') {
-                vacationTimeFields.style.display = 'block';
-                // Limpiar campos de vacaciones pagadas
-                document.querySelector('.vacationPaidDays').value = '0';
-                document.querySelector('.vacationPaidPayment').value = '0';
-            } else if (selectedType === 'paid') {
-                vacationPaidFields.style.display = 'block';
-                // Limpiar campos de vacaciones en tiempo
-                document.querySelector('.vacationTimeDays').value = '0';
-                document.querySelector('.vacationTimePayment').value = '0';
-                document.querySelector('.vacationTimeStartDate').value = '';
-                document.querySelector('.vacationTimeEndDate').value = '';
-            } else if (selectedType === 'both') {
-                vacationTimeFields.style.display = 'block';
-                vacationPaidFields.style.display = 'block';
-            } else { // none
-                // Limpiar todos los campos de vacaciones
-                document.querySelector('.vacationTimeDays').value = '0';
-                document.querySelector('.vacationTimePayment').value = '0';
-                document.querySelector('.vacationTimeStartDate').value = '';
-                document.querySelector('.vacationTimeEndDate').value = '';
-                document.querySelector('.vacationPaidDays').value = '0';
-                document.querySelector('.vacationPaidPayment').value = '0';
-            }
-        });
-    }
 });
-
 
 
 
