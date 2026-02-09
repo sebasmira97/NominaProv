@@ -349,10 +349,27 @@
                             </div>
                             <div class="form-group">
                                 <label>
-                                    Intereses de Cesantías
-                                    <span class="info-icon" title="Intereses sobre cesantías. El porcentaje legal es 1% mensual (12% anual).">ℹ️</span>
+                                    Días trabajados
+                                    <span class="info-icon" title="Días trabajados por el empleado para calcular el interés de las cesantías. 
+                                    (1 Año = 360 días comerciales)">ℹ️</span>
                                 </label>
-                                <input type="number" class="cesantiasInterest" placeholder="0" value="0">
+                                <input type="number" class="workedDaysCesantias" placeholder="0" value="0" min="0" max="360">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    Porcentaje de Interés 🔄
+                                    <span class="info-icon" title="Porcentaje calculado automáticamente según los días trabajados. Base: 12% anual (360 días comerciales).">ℹ️</span>
+                                </label>
+                                <input type="number" class="cesantiasPorcentage" placeholder="0.00" value="0" readonly style="background-color: #f0f0f0;">
+                            </div>
+                        </div>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label>
+                                    Intereses de Cesantías 🔄
+                                    <span class="info-icon" title="Se calcula automáticamente: (Valor Cesantías × Porcentaje de Interés) / 100.">ℹ️</span>
+                                </label>
+                                <input type="number" class="cesantiasInterest" placeholder="0" value="0" readonly style="background-color: #f0f0f0;">
                             </div>
                         </div>
 

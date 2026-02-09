@@ -184,6 +184,8 @@ function setupCalculations(employeeDiv) {
     
     // Campos de cesantías
     const cesantiasPaymentInput = employeeDiv.querySelector('.cesantiasPayment');
+    const workedDaysCesantiasInput = employeeDiv.querySelector('.workedDaysCesantias');
+    const cesantiasPorcentageInput = employeeDiv.querySelector('.cesantiasPorcentage');
     const cesantiasInterestInput = employeeDiv.querySelector('.cesantiasInterest');
     
     // Campos de vacaciones
@@ -252,6 +254,34 @@ function setupCalculations(employeeDiv) {
         const vacationPaidPayment = vacationPaidDays > 0 ? Math.round(salarioDiario * vacationPaidDays) : 0;
         if (vacationPaidPaymentInput) vacationPaidPaymentInput.value = vacationPaidPayment;
         
+        // Calcular intereses de cesantías (12% anual sobre el valor de cesantías)
+        // Los intereses se calculan proporcionalmente según los días trabajados
+        const cesantiasPayment = parseFloat(cesantiasPaymentInput?.value) || 0;
+        const diasTrabajados = parseFloat(workedDaysCesantiasInput?.value) || 0;
+
+        let cesantiasPorcentageCalculated = 0;
+        let cesantiasInterestCalculated = 0;
+
+        if (cesantiasPayment > 0 && diasTrabajados > 0) {
+
+            // porcentaje aplicado (ej: 4.00, 6.00, 12.00)
+            cesantiasPorcentageCalculated = (diasTrabajados * 12) / 360;
+
+            // intereses
+            cesantiasInterestCalculated = Math.round(
+                cesantiasPayment * cesantiasPorcentageCalculated / 100
+            );
+        }
+
+        // Guardar resultados
+        if (cesantiasInterestInput) {
+            cesantiasInterestInput.value = cesantiasInterestCalculated;
+        }
+
+        if (cesantiasPorcentageInput) {
+            cesantiasPorcentageInput.value = cesantiasPorcentageCalculated.toFixed(2);
+        }
+        
         // Actualizar resumen después de calcular
         setTimeout(updatePaymentSummary, 100);
     }
@@ -262,7 +292,7 @@ function setupCalculations(employeeDiv) {
         hedAmountInput, hedPercentageInput, henAmountInput, henPercentageInput,
         hedfAmountInput, hedfPercentageInput, hrnAmountInput, hrnPercentageInput,
         hrdfAmountInput, hrdfPercentageInput, hendfAmountInput, hendfPercentageInput,
-        hrndfAmountInput, hrndfPercentageInput, cesantiasPaymentInput, cesantiasInterestInput,
+        hrndfAmountInput, hrndfPercentageInput, cesantiasPaymentInput, workedDaysCesantiasInput,
         vacationTimeDaysInput, vacationPaidDaysInput
     ];
 
@@ -652,7 +682,8 @@ function updatePaymentSummary() {
     const cesantiasPayment = getNumVal('.cesantiasPayment');
     const cesantiasInterest = getNumVal('.cesantiasInterest');
     const vacationPaidPayment = getNumVal('.vacationPaidPayment');
-    const otherConcepts = bonusPayment + primePayment + commission + conceptS + cesantiasPayment + cesantiasInterest + vacationPaidPayment;
+    // Las cesantías y sus intereses NO se suman en otros conceptos (son pagos no salariales)
+    const otherConcepts = bonusPayment + primePayment + commission + conceptS + cesantiasInterest + vacationPaidPayment;
     const totalEarned = salaryWorked + totalOvertime + transportationAssistance + otherConcepts;
 
     // Deducciones
@@ -804,6 +835,7 @@ function generateEmployeeJSON() {
     const commission = getNumVal('.commission');
     const conceptS = getNumVal('.conceptS');
     const cesantiasPayment = getNumVal('.cesantiasPayment');
+    const cesantiasPorcentage = getNumVal('.cesantiasPorcentage');
     const cesantiasInterest = getNumVal('.cesantiasInterest');
     
     // Vacaciones
@@ -814,13 +846,11 @@ function generateEmployeeJSON() {
     const vacationTimeStartDate = getVal('.vacationTimeStartDate', '2021-12-31');
     const vacationTimeEndDate = getVal('.vacationTimeEndDate', '2021-12-31');
     
-    // Porcentaje legal de cesantías en Colombia: 8.33% (equivalente a 1 mes de salario por año / 12 meses)
-    const cesantiasPercentage = cesantiasPayment > 0 ? "12.00" : "0.00";
-    
     // Calcular totales
     const totalOvertimePayment = hedPayment + henPayment + hedfPayment + hrnPayment + hrdfPayment + hendfPayment + hrndfPayment;
     const salaryWorked = getNumVal('.salaryWorked');
-    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + primePayment + commission + conceptS + cesantiasPayment + cesantiasInterest + vacationPaidPayment;
+    // Las cesantías y sus intereses NO se incluyen en el total devengado (son pagos no salariales separados)
+    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + primePayment + commission + conceptS + cesantiasInterest + vacationPaidPayment;
     
     // Deducciones
     const healthDeduction = getNumVal('.healthDeduction');
@@ -974,7 +1004,7 @@ function generateEmployeeJSON() {
             },
             "cesantias": {
                 "payment": cesantiasPayment.toFixed(2),
-                "percentage": cesantiasPercentage,
+                "percentage": cesantiasPorcentage.toFixed(2),
                 "interest_payment": cesantiasInterest.toFixed(2)
             },
             "incapacity": [
