@@ -675,6 +675,8 @@ function updatePaymentSummary() {
     const totalOvertime = hedPayment + henPayment + hedfPayment + hrnPayment + hrdfPayment + hendfPayment + hrndfPayment;
     
     const transportationAssistance = getNumVal('.transportationAssistance');
+    const viaticMaintenance = getNumVal('.viaticMaintenance');
+    const viaticNonSalary = getNumVal('.viaticNonSalary');
     const bonusPayment = getNumVal('.bonusPayment');
     const primePayment = getNumVal('.primePayment');
     const commission = getNumVal('.commission');
@@ -682,8 +684,13 @@ function updatePaymentSummary() {
     const cesantiasPayment = getNumVal('.cesantiasPayment');
     const cesantiasInterest = getNumVal('.cesantiasInterest');
     const vacationPaidPayment = getNumVal('.vacationPaidPayment');
-    // Las cesantías y sus intereses NO se suman en otros conceptos (son pagos no salariales)
-    const otherConcepts = bonusPayment + primePayment + commission + conceptS + cesantiasInterest + vacationPaidPayment;
+    
+    // Verificar si es retiro/liquidación
+    const isRetirement = document.getElementById('isRetirement')?.checked || false;
+    
+    // Las cesantías solo se suman al total cuando es retiro (liquidación directa al empleado)
+    const cesantiasTotal = isRetirement ? cesantiasPayment : 0;
+    const otherConcepts = bonusPayment + primePayment + commission + conceptS + cesantiasInterest + vacationPaidPayment + viaticMaintenance + viaticNonSalary + cesantiasTotal;
     const totalEarned = salaryWorked + totalOvertime + transportationAssistance + otherConcepts;
 
     // Deducciones
@@ -830,6 +837,8 @@ function generateEmployeeJSON() {
     
     // Otros conceptos
     const transportationAssistance = getNumVal('.transportationAssistance');
+    const viaticMaintenance = getNumVal('.viaticMaintenance');
+    const viaticNonSalary = getNumVal('.viaticNonSalary');
     const bonusPayment = getNumVal('.bonusPayment');
     const primePayment = getNumVal('.primePayment');
     const commission = getNumVal('.commission');
@@ -849,8 +858,13 @@ function generateEmployeeJSON() {
     // Calcular totales
     const totalOvertimePayment = hedPayment + henPayment + hedfPayment + hrnPayment + hrdfPayment + hendfPayment + hrndfPayment;
     const salaryWorked = getNumVal('.salaryWorked');
-    // Las cesantías y sus intereses NO se incluyen en el total devengado (son pagos no salariales separados)
-    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + primePayment + commission + conceptS + cesantiasInterest + vacationPaidPayment;
+    
+    // Verificar si es retiro/liquidación
+    const isRetirement = document.getElementById('isRetirement')?.checked || false;
+    
+    // Las cesantías solo se incluyen en el total cuando es retiro (liquidación directa al empleado)
+    const cesantiasTotal = isRetirement ? cesantiasPayment : 0;
+    const totalEarned = salaryWorked + transportationAssistance + totalOvertimePayment + bonusPayment + primePayment + commission + conceptS + cesantiasInterest + vacationPaidPayment + viaticMaintenance + viaticNonSalary + cesantiasTotal;
     
     // Deducciones
     const healthDeduction = getNumVal('.healthDeduction');
@@ -860,9 +874,6 @@ function generateEmployeeJSON() {
     
     const totalDeductions = healthDeduction + pensionDeduction + thirdPartyPay + otherDeduction;
     const totalVoucher = totalEarned - totalDeductions;
-    
-    // Verificar si es retiro/liquidación
-    const isRetirement = document.getElementById('isRetirement')?.checked || false;
 
     return {
         "resolution_number": document.getElementById('resolutionNumber')?.value || "18760000001",
@@ -1244,6 +1255,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Limpiar los campos cuando se desmarca
                 document.getElementById('departureDate').value = '';
             }
+            // Recalcular totales cuando cambia el estado de retiro (para incluir/excluir cesantías)
+            updatePaymentSummary();
         });
     }
     
