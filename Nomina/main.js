@@ -1,3 +1,81 @@
+// =============================================================================
+// CONSTANTES DE REGULACIÓN LABORAL COLOMBIANA
+// -----------------------------------------------------------------------------
+// Única fuente de verdad de los porcentajes y bases de cálculo.
+// Ante un cambio de normativa, este es el único bloque que se toca: el
+// formulario se llena a partir de aquí (ver aplicarRecargosLegales) y los
+// cálculos y el JSON leen de aquí.
+//
+// Vigencia: septiembre 2026
+//   - Jornada de 42 h/semana (Ley 2101 de 2021, última reducción desde jul-2026)
+//   - Recargo dominical/festivo al 90% (Ley 2466 de 2025; sube a 100% en jul-2027)
+// =============================================================================
+const REGULACION = {
+    // Jornada
+    HORAS_SEMANALES: 42,
+    DIAS_SEMANA: 6,
+    DIAS_MES: 30,
+
+    // Recargos base
+    RECARGO_NOCTURNO: 35,
+    RECARGO_DOMINICAL: 90,   // jul-2025: 80 | jul-2026: 90 | jul-2027: 100
+
+    // Horas extra
+    EXTRA_DIURNA: 25,
+    EXTRA_NOCTURNA: 75,
+
+    // Aportes del trabajador
+    PORCENTAJE_SALUD: 4,
+    PORCENTAJE_PENSION: 4,
+
+    // Intereses sobre cesantías: 12% anual sobre año comercial de 360 días
+    INTERES_CESANTIAS_ANUAL: 12,
+    DIAS_ANIO_COMERCIAL: 360
+};
+
+// Horas mensuales para el valor de la hora ordinaria: 42 / 6 x 30 = 210
+REGULACION.HORAS_MES =
+    (REGULACION.HORAS_SEMANALES / REGULACION.DIAS_SEMANA) * REGULACION.DIAS_MES;
+
+// Porcentajes de cada concepto de hora extra / recargo.
+// Los conceptos dominicales y festivos se derivan sumando RECARGO_DOMINICAL,
+// así que cambiar ese único valor arriba los actualiza todos a la vez.
+// Las claves coinciden con las clases del formulario (hed -> .hedPercentage).
+const RECARGOS = {
+    hed:   REGULACION.EXTRA_DIURNA,                                     // 25
+    hen:   REGULACION.EXTRA_NOCTURNA,                                   // 75
+    hrn:   REGULACION.RECARGO_NOCTURNO,                                 // 35
+    hedf:  REGULACION.EXTRA_DIURNA     + REGULACION.RECARGO_DOMINICAL,  // 115
+    hrdf:  REGULACION.RECARGO_DOMINICAL,                                // 90
+    hendf: REGULACION.EXTRA_NOCTURNA   + REGULACION.RECARGO_DOMINICAL,  // 165
+    hrndf: REGULACION.RECARGO_NOCTURNO + REGULACION.RECARGO_DOMINICAL   // 125
+};
+
+// Vuelca los porcentajes de ley sobre los campos del formulario.
+// El HTML ya no los declara: se llenan desde RECARGOS al inicializar.
+function aplicarRecargosLegales(employeeDiv) {
+    Object.entries(RECARGOS).forEach(([concepto, porcentaje]) => {
+        const input = employeeDiv.querySelector(`.${concepto}Percentage`);
+        if (input) {
+            input.value = porcentaje;
+            input.placeholder = porcentaje;
+        }
+    });
+
+    const aportes = [
+        ['.healthPercentage', REGULACION.PORCENTAJE_SALUD],
+        ['.pensionPercentage', REGULACION.PORCENTAJE_PENSION]
+    ];
+
+    aportes.forEach(([selector, porcentaje]) => {
+        const input = employeeDiv.querySelector(selector);
+        if (input) {
+            input.value = porcentaje;
+            input.placeholder = porcentaje;
+        }
+    });
+}
+
 let employeeCount = 0;
 
 // Función para cargar ciudades desde la API
@@ -196,26 +274,26 @@ function setupCalculations(employeeDiv) {
 
     function calculateAll() {
         const salary = parseFloat(salaryInput?.value) || 0;
-        const workedDays = parseFloat(workedDaysInput?.value) || 30;
-        const healthPercentage = parseFloat(healthPercentageInput?.value) || 4;
-        const pensionPercentage = parseFloat(pensionPercentageInput?.value) || 4;
-        
+        const workedDays = parseFloat(workedDaysInput?.value) || REGULACION.DIAS_MES;
+        const healthPercentage = parseFloat(healthPercentageInput?.value) || REGULACION.PORCENTAJE_SALUD;
+        const pensionPercentage = parseFloat(pensionPercentageInput?.value) || REGULACION.PORCENTAJE_PENSION;
+
         // Calcular salario trabajado
-        const salaryWorked = salary > 0 ? Math.round((salary / 30) * workedDays) : 0;
+        const salaryWorked = salary > 0 ? Math.round((salary / REGULACION.DIAS_MES) * workedDays) : 0;
         if (salaryWorkedInput) salaryWorkedInput.value = salaryWorked;
-        
-        // Valor hora base (220 horas mensuales = 30 días x 8 horas)
-        const valorHora = salary > 0 ? salary / 220 : 0;
-        
+
+        // Valor de la hora ordinaria según la jornada legal vigente
+        const valorHora = salary > 0 ? salary / REGULACION.HORAS_MES : 0;
+
         // Calcular todas las horas extras
         const calculations = [
-            { amount: hedAmountInput, percentage: hedPercentageInput, payment: hedPaymentInput, defaultPercent: 25, type: 'extra' },
-            { amount: henAmountInput, percentage: henPercentageInput, payment: henPaymentInput, defaultPercent: 75, type: 'extra' },
-            { amount: hedfAmountInput, percentage: hedfPercentageInput, payment: hedfPaymentInput, defaultPercent: 105, type: 'extra' },
-            { amount: hrnAmountInput, percentage: hrnPercentageInput, payment: hrnPaymentInput, defaultPercent: 35, type: 'recargo' },
-            { amount: hrdfAmountInput, percentage: hrdfPercentageInput, payment: hrdfPaymentInput, defaultPercent: 80, type: 'recargo' },
-            { amount: hendfAmountInput, percentage: hendfPercentageInput, payment: hendfPaymentInput, defaultPercent: 155, type: 'extra' },
-            { amount: hrndfAmountInput, percentage: hrndfPercentageInput, payment: hrndfPaymentInput, defaultPercent: 115, type: 'recargo' }
+            { amount: hedAmountInput, percentage: hedPercentageInput, payment: hedPaymentInput, defaultPercent: RECARGOS.hed, type: 'extra' },
+            { amount: henAmountInput, percentage: henPercentageInput, payment: henPaymentInput, defaultPercent: RECARGOS.hen, type: 'extra' },
+            { amount: hedfAmountInput, percentage: hedfPercentageInput, payment: hedfPaymentInput, defaultPercent: RECARGOS.hedf, type: 'extra' },
+            { amount: hrnAmountInput, percentage: hrnPercentageInput, payment: hrnPaymentInput, defaultPercent: RECARGOS.hrn, type: 'recargo' },
+            { amount: hrdfAmountInput, percentage: hrdfPercentageInput, payment: hrdfPaymentInput, defaultPercent: RECARGOS.hrdf, type: 'recargo' },
+            { amount: hendfAmountInput, percentage: hendfPercentageInput, payment: hendfPaymentInput, defaultPercent: RECARGOS.hendf, type: 'extra' },
+            { amount: hrndfAmountInput, percentage: hrndfPercentageInput, payment: hrndfPaymentInput, defaultPercent: RECARGOS.hrndf, type: 'recargo' }
         ];
 
         calculations.forEach(calc => {
@@ -241,8 +319,8 @@ function setupCalculations(employeeDiv) {
         if (healthDeductionInput) healthDeductionInput.value = healthDeduction;
         if (pensionDeductionInput) pensionDeductionInput.value = pensionDeduction;
         
-        // Calcular vacaciones (salario base diario = salario / 30)
-        const salarioDiario = salary > 0 ? salary / 30 : 0;
+        // Calcular vacaciones (salario base diario = salario / días del mes)
+        const salarioDiario = salary > 0 ? salary / REGULACION.DIAS_MES : 0;
         
         // Vacaciones en tiempo
         const vacationTimeDays = parseFloat(vacationTimeDaysInput?.value) || 0;
@@ -265,7 +343,8 @@ function setupCalculations(employeeDiv) {
         if (cesantiasPayment > 0 && diasTrabajados > 0) {
 
             // porcentaje aplicado (ej: 4.00, 6.00, 12.00)
-            cesantiasPorcentageCalculated = (diasTrabajados * 12) / 360;
+            cesantiasPorcentageCalculated =
+                (diasTrabajados * REGULACION.INTERES_CESANTIAS_ANUAL) / REGULACION.DIAS_ANIO_COMERCIAL;
 
             // intereses
             cesantiasInterestCalculated = Math.round(
@@ -301,6 +380,9 @@ function setupCalculations(employeeDiv) {
             input.addEventListener('input', calculateAll);
         }
     });
+
+    // Llenar los porcentajes de ley antes del primer cálculo
+    aplicarRecargosLegales(employeeDiv);
 
     // Calcular inicialmente
     calculateAll();
@@ -804,35 +886,35 @@ function generateEmployeeJSON() {
     
     // Datos básicos
     const salary = getNumVal('.salary');
-    const workedDays = getNumVal('.workedDays', 30);
+    const workedDays = getNumVal('.workedDays', REGULACION.DIAS_MES);
     
     // Todas las horas extras
     const hedAmount = getNumVal('.hedAmount');
-    const hedPercentage = getNumVal('.hedPercentage', 25);
+    const hedPercentage = getNumVal('.hedPercentage', RECARGOS.hed);
     const hedPayment = getNumVal('.hedPayment');
     
     const henAmount = getNumVal('.henAmount');
-    const henPercentage = getNumVal('.henPercentage', 75);
+    const henPercentage = getNumVal('.henPercentage', RECARGOS.hen);
     const henPayment = getNumVal('.henPayment');
     
     const hedfAmount = getNumVal('.hedfAmount');
-    const hedfPercentage = getNumVal('.hedfPercentage', 100);
+    const hedfPercentage = getNumVal('.hedfPercentage', RECARGOS.hedf);
     const hedfPayment = getNumVal('.hedfPayment');
     
     const hrnAmount = getNumVal('.hrnAmount');
-    const hrnPercentage = getNumVal('.hrnPercentage', 35);
+    const hrnPercentage = getNumVal('.hrnPercentage', RECARGOS.hrn);
     const hrnPayment = getNumVal('.hrnPayment');
     
     const hrdfAmount = getNumVal('.hrdfAmount');
-    const hrdfPercentage = getNumVal('.hrdfPercentage', 75);
+    const hrdfPercentage = getNumVal('.hrdfPercentage', RECARGOS.hrdf);
     const hrdfPayment = getNumVal('.hrdfPayment');
     
     const hendfAmount = getNumVal('.hendfAmount');
-    const hendfPercentage = getNumVal('.hendfPercentage', 150);
+    const hendfPercentage = getNumVal('.hendfPercentage', RECARGOS.hendf);
     const hendfPayment = getNumVal('.hendfPayment');
     
     const hrndfAmount = getNumVal('.hrndfAmount');
-    const hrndfPercentage = getNumVal('.hrndfPercentage', 110);
+    const hrndfPercentage = getNumVal('.hrndfPercentage', RECARGOS.hrndf);
     const hrndfPayment = getNumVal('.hrndfPayment');
     
     // Otros conceptos
@@ -1110,11 +1192,11 @@ function generateEmployeeJSON() {
         },
         "deductions": {
             "health": {
-                "percentage": getNumVal('.healthPercentage', 4).toString(),
+                "percentage": getNumVal('.healthPercentage', REGULACION.PORCENTAJE_SALUD).toString(),
                 "deduction": healthDeduction.toString()
             },
             "pension_fund": {
-                "percentage": getNumVal('.pensionPercentage', 4).toString(),
+                "percentage": getNumVal('.pensionPercentage', REGULACION.PORCENTAJE_PENSION).toString(),
                 "deduction": pensionDeduction.toString()
             },
             "fundSP": {
