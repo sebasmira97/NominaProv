@@ -250,6 +250,8 @@ input:focus, select:focus, textarea:focus {
 .info-icon, .help-icon {
     display: inline-block;
     margin-left: 5px;
+    padding: 4px;
+    margin: -4px 1px;
     cursor: help;
     font-size: 0.9em;
     opacity: 0.7;
@@ -271,6 +273,32 @@ input:focus, select:focus, textarea:focus {
 /* Tooltip mejorado */
 .info-icon[title], .help-icon[title] {
     position: relative;
+}
+
+/* Tooltip activado por click/tap (el title nativo del navegador solo
+   responde al hover del mouse; en pantallas táctiles no hay hover, así
+   que sin esto el ícono no hacía nada al tocarlo). Ver main.js. */
+.info-icon.tooltip-active::after,
+.help-icon.tooltip-active::after {
+    content: attr(title);
+    position: absolute;
+    left: 50%;
+    top: 130%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 260px;
+    background: #2c3e50;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1.4;
+    white-space: normal;
+    text-align: left;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Resumen de Pagos */

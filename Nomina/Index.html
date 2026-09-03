@@ -140,38 +140,38 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="documentNumber">
+                                <label for="employeeDocumentNumber">
                                     Número de Documento <span class="required">*</span>
                                 </label>
-                                <input type="text" class="documentNumber" required placeholder="12345678">
+                                <input type="text" id="employeeDocumentNumber" class="documentNumber" required placeholder="12345678">
                             </div>
-                            
+
                             <div class="form-group">
-                                <label for="firstName">
+                                <label for="employeeFirstName">
                                     Primer Nombre <span class="required">*</span>
                                 </label>
-                                <input type="text" class="firstName" required placeholder="Juan">
+                                <input type="text" id="employeeFirstName" class="firstName" required placeholder="Juan">
                             </div>
-                            
+
                             <div class="form-group">
-                                <label for="otherNames">
+                                <label for="employeeOtherNames">
                                     Segundo Nombre
                                 </label>
-                                <input type="text" class="otherNames" placeholder="Carlos">
+                                <input type="text" id="employeeOtherNames" class="otherNames" placeholder="Carlos">
                             </div>
-                            
+
                             <div class="form-group">
-                                <label for="firstSurname">
+                                <label for="employeeFirstSurname">
                                     Primer Apellido <span class="required">*</span>
                                 </label>
-                                <input type="text" class="firstSurname" required placeholder="Pérez">
+                                <input type="text" id="employeeFirstSurname" class="firstSurname" required placeholder="Pérez">
                             </div>
-                            
+
                             <div class="form-group">
-                                <label for="secondSurname">
+                                <label for="employeeSecondSurname">
                                     Segundo Apellido
                                 </label>
-                                <input type="text" class="secondSurname" placeholder="González">
+                                <input type="text" id="employeeSecondSurname" class="secondSurname" placeholder="González">
                             </div>
 
                         </div>
@@ -214,13 +214,13 @@
                                 <label for="salary">
                                     Salario <span class="required">*</span>
                                 </label>
-                                <input type="number" class="salary" required placeholder="1200000">
+                                <input type="number" id="salary" class="salary" required placeholder="1200000">
                             </div>
                             <div class="form-group">
                                 <label for="workerCode">
                                     Código del Trabajador <span class="required">*</span>
                                 </label>
-                                <input type="text" class="workerCode" required placeholder="EMP001">
+                                <input type="text" id="workerCode" class="workerCode" required placeholder="EMP001">
                             </div>
                             <div class="form-group">
                                 <label>¿Salario Integral?</label>
@@ -261,7 +261,7 @@
                                 <label for="bank">
                                     Banco <span class="required bank-required">*</span>
                                 </label>
-                                <input type="text" class="bank" required placeholder="Bancolombia">
+                                <input type="text" id="bank" class="bank" required placeholder="Bancolombia">
                             </div>
                             <div class="form-group">
                                 <label>Tipo de Cuenta</label>
@@ -274,7 +274,7 @@
                                 <label for="accountNumber">
                                     Número de Cuenta <span class="required account-required">*</span>
                                 </label>
-                                <input type="text" class="accountNumber" required placeholder="123456789">
+                                <input type="text" id="accountNumber" class="accountNumber" required placeholder="123456789">
                             </div>
                         </div>
                     </div>
@@ -321,6 +321,11 @@
                             <div class="form-group">
                                 <label>Bonificaciones</label>
                                 <input type="number" class="bonusPayment" placeholder="0" value="0">
+                                <label style="display: flex; align-items: center; font-weight: normal; margin-top: 6px; cursor: pointer;">
+                                    <input type="checkbox" class="bonusHabitual" style="margin-right: 6px; cursor: pointer; width: auto;">
+                                    ¿Es habitual?
+                                    <span class="info-icon" title="Marque esta opción solo si la bonificación se paga de forma habitual (todos los meses). Según el Código Sustantivo del Trabajo (art. 127-128), una bonificación habitual es salario y debe sumar a la base de salud y pensión (IBC); una bonificación ocasional u ofrecida por mera liberalidad del empleador, no.">ℹ️</span>
+                                </label>
                             </div>
                             <div class="form-group">
                                 <label>Prima de Servicios</label>
@@ -564,6 +569,15 @@
                     <!-- Deducciones -->
                     <div class="subsection">
                         <h3>➖ Deducciones</h3>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>
+                                    Base de Cotización (IBC)
+                                    <span class="info-icon" title="Ingreso Base de Cotización para salud y pensión. Se calcula automáticamente: Salario Trabajado + Horas Extras/Recargos + Comisiones + Otros Conceptos Salariales + Bonificación (solo si es habitual). NO incluye auxilio de transporte, viáticos, prima ni cesantías, porque no son salario para efectos de cotización.">ℹ️</span>
+                                </label>
+                                <input type="number" class="ibcBase" readonly style="background-color: #f0f0f0;">
+                            </div>
+                        </div>
                         <div class="form-row-2">
                             <div class="form-group">
                                 <label>% Salud</label>

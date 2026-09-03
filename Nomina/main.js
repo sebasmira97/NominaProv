@@ -76,6 +76,31 @@ function aplicarRecargosLegales(employeeDiv) {
     });
 }
 
+// Los íconos ℹ️ dependen del atributo "title", que el navegador solo
+// muestra con hover del mouse. En pantallas táctiles no hay hover, así
+// que tocarlos no hacía nada. Esto agrega soporte de click/tap: activa
+// un tooltip visual (ver .tooltip-active en styles.css) y cierra
+// cualquier otro que estuviera abierto.
+document.addEventListener('click', function(e) {
+    const icon = e.target.closest('.info-icon, .help-icon');
+
+    // Si el ícono vive dentro de un <label> (ej. "Retiro del Empleado"),
+    // evitar que el navegador interprete el toque como clic sobre el
+    // checkbox asociado a ese label.
+    if (icon) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    document.querySelectorAll('.info-icon.tooltip-active, .help-icon.tooltip-active').forEach(el => {
+        if (el !== icon) el.classList.remove('tooltip-active');
+    });
+
+    if (icon) {
+        icon.classList.toggle('tooltip-active');
+    }
+});
+
 let employeeCount = 0;
 
 // Función para cargar ciudades desde la API
@@ -230,6 +255,11 @@ function setupCalculations(employeeDiv) {
     const healthDeductionInput = employeeDiv.querySelector('.healthDeduction');
     const pensionPercentageInput = employeeDiv.querySelector('.pensionPercentage');
     const pensionDeductionInput = employeeDiv.querySelector('.pensionDeduction');
+    const ibcBaseInput = employeeDiv.querySelector('.ibcBase');
+    const commissionInput = employeeDiv.querySelector('.commission');
+    const conceptSInput = employeeDiv.querySelector('.conceptS');
+    const bonusPaymentInput = employeeDiv.querySelector('.bonusPayment');
+    const bonusHabitualInput = employeeDiv.querySelector('.bonusHabitual');
     
     // Campos para todos los tipos de horas extras
     const hedAmountInput = employeeDiv.querySelector('.hedAmount');
@@ -296,11 +326,12 @@ function setupCalculations(employeeDiv) {
             { amount: hrndfAmountInput, percentage: hrndfPercentageInput, payment: hrndfPaymentInput, defaultPercent: RECARGOS.hrndf, type: 'recargo' }
         ];
 
+        let totalOvertimePayment = 0;
         calculations.forEach(calc => {
             const amount = parseFloat(calc.amount?.value) || 0;
             const percentage = parseFloat(calc.percentage?.value) || calc.defaultPercent;
             let payment = 0;
-            
+
             if (amount > 0 && valorHora > 0) {
                 if (calc.type === 'extra') {
                     payment = Math.round(valorHora * (1 + percentage / 100) * amount);
@@ -308,14 +339,31 @@ function setupCalculations(employeeDiv) {
                     payment = Math.round(valorHora * (percentage / 100) * amount);
                 }
             }
-            
+
             if (calc.payment) calc.payment.value = payment;
+            totalOvertimePayment += payment;
         });
-        
-        // Calcular deducciones sobre salario trabajado
-        const healthDeduction = Math.round(salaryWorked * healthPercentage / 100);
-        const pensionDeduction = Math.round(salaryWorked * pensionPercentage / 100);
-        
+
+        // IBC (Ingreso Base de Cotización) para salud y pensión.
+        // Por ley (CST art. 127-128) incluye el salario y todo lo que constituya
+        // remuneración directa del servicio: horas extra/recargos, comisiones y
+        // otros conceptos salariales. Una bonificación solo entra si es habitual.
+        // NO incluye auxilio de transporte, viáticos, prima ni cesantías, porque
+        // esos conceptos no son salario para efectos de cotización.
+        const commission = parseFloat(commissionInput?.value) || 0;
+        const conceptS = parseFloat(conceptSInput?.value) || 0;
+        const bonusPayment = parseFloat(bonusPaymentInput?.value) || 0;
+        const bonusEsHabitual = bonusHabitualInput?.checked || false;
+
+        const ibcBase = salaryWorked + totalOvertimePayment + commission + conceptS +
+            (bonusEsHabitual ? bonusPayment : 0);
+
+        if (ibcBaseInput) ibcBaseInput.value = ibcBase;
+
+        // Calcular deducciones sobre el IBC (no sobre el salario base puro)
+        const healthDeduction = Math.round(ibcBase * healthPercentage / 100);
+        const pensionDeduction = Math.round(ibcBase * pensionPercentage / 100);
+
         if (healthDeductionInput) healthDeductionInput.value = healthDeduction;
         if (pensionDeductionInput) pensionDeductionInput.value = pensionDeduction;
         
@@ -372,7 +420,8 @@ function setupCalculations(employeeDiv) {
         hedfAmountInput, hedfPercentageInput, hrnAmountInput, hrnPercentageInput,
         hrdfAmountInput, hrdfPercentageInput, hendfAmountInput, hendfPercentageInput,
         hrndfAmountInput, hrndfPercentageInput, cesantiasPaymentInput, workedDaysCesantiasInput,
-        vacationTimeDaysInput, vacationPaidDaysInput
+        vacationTimeDaysInput, vacationPaidDaysInput,
+        commissionInput, conceptSInput, bonusPaymentInput
     ];
 
     allInputs.forEach(input => {
@@ -380,6 +429,11 @@ function setupCalculations(employeeDiv) {
             input.addEventListener('input', calculateAll);
         }
     });
+
+    // El checkbox de habitualidad dispara 'change', no 'input'
+    if (bonusHabitualInput) {
+        bonusHabitualInput.addEventListener('change', calculateAll);
+    }
 
     // Llenar los porcentajes de ley antes del primer cálculo
     aplicarRecargosLegales(employeeDiv);
